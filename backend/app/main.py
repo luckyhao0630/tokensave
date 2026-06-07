@@ -26,6 +26,14 @@ app.include_router(billing.router)
 app.include_router(proxy.router)
 app.include_router(admin.router)
 
+@app.get("/api/v1")
+async def root_api():
+    return {"message": "TokenSaver API", "version": "1.0.0", "docs": "/docs"}
+
+@app.get("/api/v1/")
+async def root_api_slash():
+    return {"message": "TokenSaver API", "version": "1.0.0", "docs": "/docs"}
+
 @app.get("/")
 async def root():
     return {"message": "TokenSaver API", "version": "1.0.0", "docs": "/docs"}
