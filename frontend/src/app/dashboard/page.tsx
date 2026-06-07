@@ -1,25 +1,27 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AnimatedNumber } from "@/components/animated-number";
-import { compressionApi, billingApi, getToken } from "@/lib/api";
+import { compressionApi, billingApi, apiKeyApi, getToken, removeToken } from "@/lib/api";
 import { useEffect, useState } from "react";
 import {
-  Zap,
-  TrendingDown,
-  BarChart3,
-  Key,
-  Copy,
-  RefreshCw,
-  ArrowUpRight,
-  ChevronRight,
-  Loader2,
+  Zap, TrendingDown, BarChart3, Key, Copy, RefreshCw,
+  ArrowUpRight, ChevronRight, Loader2, User, LogOut, Settings
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+interface ApiKeyItem {
+  id: number;
+  name: string;
+  key_prefix: string;
+  is_active: boolean;
+  created_at: string;
+  last_used_at?: string;
+}
 
 interface StatsData {
   total_requests: number;
@@ -45,10 +47,14 @@ interface PlanData {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [stats, setStats] = useState<StatsData | null>(null);
   const [plan, setPlan] = useState<PlanData | null>(null);
+  const [apiKeys, setApiKeys] = useState<ApiKeyItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [creatingKey, setCreatingKey] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -60,13 +66,15 @@ export default function DashboardPage() {
           return;
         }
 
-        const [statsData, planData] = await Promise.all([
-          compressionApi.getStats(),
-          billingApi.getCurrentPlan(),
+        const [statsData, planData, keysData] = await Promise.all([
+          compressionApi.getStats().catch(() => null),
+          billingApi.getCurrentPlan().catch(() => null),
+          apiKeyApi.list().catch(() => []),
         ]);
 
         setStats(statsData);
         setPlan(planData);
+        setApiKeys(keysData || []);
       } catch (err: any) {
         setError(err.message || "加载失败");
       } finally {
@@ -76,6 +84,43 @@ export default function DashboardPage() {
 
     loadData();
   }, []);
+
+  async function handleCreateKey() {
+    setCreatingKey(true);
+    try {
+      const result = await apiKeyApi.create("生产环境");
+      if (result.api_key) {
+        alert(`API Key 创建成功: ${result.api_key}\n\n请立即复制保存，此Key只显示一次！`);
+        const keys = await apiKeyApi.list();
+        setApiKeys(keys || []);
+      }
+    } catch (err: any) {
+      alert("创建失败: " + err.message);
+    } finally {
+      setCreatingKey(false);
+    }
+  }
+
+  async function handleDeleteKey(id: number) {
+    if (!confirm("确定删除此 API Key？")) return;
+    try {
+      await apiKeyApi.delete(id);
+      const keys = await apiKeyApi.list();
+      setApiKeys(keys || []);
+    } catch (err: any) {
+      alert("删除失败: " + err.message);
+    }
+  }
+
+  function handleLogout() {
+    removeToken();
+    router.push("/login");
+  }
+
+  function handleCopyKey(key: string) {
+    navigator.clipboard.writeText(key);
+    alert("API Key 已复制到剪贴板");
+  }
 
   if (loading) {
     return (
@@ -89,15 +134,9 @@ export default function DashboardPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
         <p className="text-red-500">{error}</p>
-        {error === "缺少 API Key" ? (
-          <Button onClick={() => router.push("/api-keys")}>
-            创建 API Key
-          </Button>
-        ) : (
-          <Link href="/login">
-            <Button>去登录</Button>
-          </Link>
-        )}
+        <Link href="/login">
+          <Button>去登录</Button>
+        </Link>
       </div>
     );
   }
@@ -140,6 +179,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-secondary/30">
+      {/* Nav */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-border/50">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
@@ -150,23 +190,38 @@ export default function DashboardPage() {
           </Link>
           <div className="flex items-center gap-4">
             <Badge variant="secondary" className="rounded-full">
-              {plan?.plan === "pro"
-                ? "专业版"
-                : plan?.plan === "team"
-                ? "团队版"
-                : plan?.plan === "enterprise"
-                ? "企业版"
-                : "免费版"}
+              {plan?.plan === "pro" ? "专业版" : plan?.plan === "team" ? "团队版" : plan?.plan === "enterprise" ? "企业版" : "免费版"}
             </Badge>
-            <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-              <span className="text-sm font-medium">鹏</span>
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80"
+              >
+                <User className="w-4 h-4" />
+              </button>
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-border/50 py-2">
+                  <Link href="/profile" className="flex items-center gap-2 px-4 py-2 hover:bg-secondary/50 text-sm">
+                    <Settings className="w-4 h-4" /> 个人设置
+                  </Link>
+                  <Link href="/pricing" className="flex items-center gap-2 px-4 py-2 hover:bg-secondary/50 text-sm">
+                    <Zap className="w-4 h-4" /> 升级套餐
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-secondary/50 text-sm w-full text-left text-red-600"
+                  >
+                    <LogOut className="w-4 h-4" /> 退出登录
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </nav>
 
       <div className="max-w-7xl mx-auto px-6 py-8 w-full">
-        {/* Stats Overview */}
+        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           {statsCards.map((stat, i) => (
             <Card key={i} className="p-6 rounded-2xl border-none shadow-sm bg-white">
@@ -181,11 +236,7 @@ export default function DashboardPage() {
               <div className="space-y-1">
                 <p className="text-2xl font-semibold tracking-tight">
                   {stat.prefix || ""}
-                  <AnimatedNumber
-                    value={stat.value}
-                    duration={1.5}
-                    className="tabular-nums"
-                  />
+                  <AnimatedNumber value={stat.value} duration={1.5} className="tabular-nums" />
                   {stat.suffix}
                 </p>
                 <p className="text-sm text-muted-foreground">{stat.label}</p>
@@ -200,64 +251,62 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-semibold">API Keys</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  管理您的 API 访问密钥
-                </p>
+                <p className="text-sm text-muted-foreground mt-1">管理您的 API 访问密钥</p>
               </div>
-              <Button size="sm" className="rounded-full gap-2">
-                <RefreshCw className="w-4 h-4" />
+              <Button
+                size="sm"
+                className="rounded-full gap-2"
+                onClick={handleCreateKey}
+                disabled={creatingKey}
+              >
+                {creatingKey ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                 创建新密钥
               </Button>
             </div>
             <div className="space-y-3">
-              {[
-                {
-                  name: "生产环境",
-                  key: "ts_live_...7a2b",
-                  env: "Production",
-                  lastUsed: "2分钟前",
-                },
-                {
-                  name: "测试环境",
-                  key: "ts_test_...9f1c",
-                  env: "Test",
-                  lastUsed: "3小时前",
-                },
-              ].map((apiKey, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/50"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 rounded-lg bg-white border border-border/50">
-                      <Key className="w-4 h-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{apiKey.name}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <code className="text-xs bg-white px-2 py-0.5 rounded border border-border/50">
-                          {apiKey.key}
-                        </code>
-                        <span className="text-xs text-muted-foreground">
-                          {apiKey.env}
-                        </span>
+              {apiKeys.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Key className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p>暂无 API Key，点击上方按钮创建</p>
+                </div>
+              ) : (
+                apiKeys.map((apiKey) => (
+                  <div
+                    key={apiKey.id}
+                    className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/50"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 rounded-lg bg-white border border-border/50">
+                        <Key className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{apiKey.name || "Default"}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <code className="text-xs bg-white px-2 py-0.5 rounded border border-border/50">
+                            {apiKey.key_prefix || "ts_..."}
+                          </code>
+                          <span className="text-xs text-muted-foreground">
+                            {apiKey.is_active ? "活跃" : "已禁用"}
+                          </span>
+                        </div>
                       </div>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {apiKey.last_used_at ? "最近使用: " + new Date(apiKey.last_used_at).toLocaleDateString() : "未使用"}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 rounded-lg"
+                        onClick={() => handleDeleteKey(apiKey.id)}
+                      >
+                        删除
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground">
-                      {apiKey.lastUsed}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-lg"
-                    >
-                      <Copy className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </Card>
 
@@ -266,10 +315,10 @@ export default function DashboardPage() {
             <h3 className="text-lg font-semibold mb-4">快速接入</h3>
             <div className="space-y-4">
               {[
-                { step: "1", title: "获取 API Key", desc: "创建生产环境密钥" },
+                { step: "1", title: "获取 API Key", desc: "点击上方创建按钮" },
                 { step: "2", title: "安装 SDK", desc: "pip install tokensaver" },
-                { step: "3", title: "替换 base_url", desc: "指向 TokenSaver" },
-                { step: "4", title: "自动压缩", desc: "零代码改动" },
+                { step: "3", title: "替换 base_url", desc: "https://api.tokesave.com/api/v1" },
+                { step: "4", title: "自动压缩", desc: "零代码改动，省钱60-95%" },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
@@ -282,20 +331,20 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-            <Button className="w-full mt-6 rounded-full gap-2" variant="outline">
-              查看完整文档
-              <ArrowUpRight className="w-4 h-4" />
-            </Button>
+            <Link href="/docs">
+              <Button className="w-full mt-6 rounded-full gap-2" variant="outline">
+                查看完整文档
+                <ArrowUpRight className="w-4 h-4" />
+              </Button>
+            </Link>
           </Card>
         </div>
 
-        {/* Usage Chart & Code Example */}
+        {/* Usage Chart & Code */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           <Card className="p-6 rounded-2xl border-none shadow-sm bg-white">
             <h3 className="text-lg font-semibold mb-4">用量趋势</h3>
-            <p className="text-sm text-muted-foreground">
-              最近7天 Token 节省趋势
-            </p>
+            <p className="text-sm text-muted-foreground">最近7天 Token 节省趋势</p>
             <div className="mt-4 h-48 flex items-end gap-2">
               {[65, 78, 52, 89, 73, 95, 82].map((height, i) => (
                 <div
@@ -308,11 +357,9 @@ export default function DashboardPage() {
               ))}
             </div>
             <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-              {["周一", "周二", "周三", "周四", "周五", "周六", "周日"].map(
-                (day) => (
-                  <span key={day}>{day}</span>
-                )
-              )}
+              {["周一", "周二", "周三", "周四", "周五", "周六", "周日"].map((day) => (
+                <span key={day}>{day}</span>
+              ))}
             </div>
           </Card>
 
@@ -321,33 +368,62 @@ export default function DashboardPage() {
               <h3 className="text-lg font-semibold">代码示例</h3>
               <Tabs defaultValue="python" className="w-auto">
                 <TabsList className="rounded-full h-8">
-                  <TabsTrigger value="python" className="text-xs rounded-full px-3">
-                    Python
-                  </TabsTrigger>
-                  <TabsTrigger value="js" className="text-xs rounded-full px-3">
-                    JS
-                  </TabsTrigger>
-                  <TabsTrigger value="curl" className="text-xs rounded-full px-3">
-                    cURL
-                  </TabsTrigger>
+                  <TabsTrigger value="python" className="text-xs rounded-full px-3">Python</TabsTrigger>
+                  <TabsTrigger value="js" className="text-xs rounded-full px-3">JS</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
-            <div className="bg-[#1e1e1e] rounded-xl p-4 overflow-x-auto">
-              <pre className="text-sm text-gray-300">
-                <code>{`from tokensaver import compress
+            <TabsContent value="python" className="mt-0">
+              <div className="bg-[#1e1e1e] rounded-xl p-4 overflow-x-auto">
+                <pre className="text-sm text-gray-300">
+                  <code>{`import requests
 
-messages = [
-  {"role": "user", "content": huge_json_data}
-]
+# 1. 获取 API Key（在 Dashboard 创建）
+API_KEY = "your-api-key-here"
 
-# 自动压缩 60-95%
-result = compress(messages, model="gpt-4o")
-print(f"Saved {result.tokens_saved} tokens")
-`}</code>
-              </pre>
-            </div>
-            <Button className="w-full mt-4 rounded-full" variant="secondary">
+# 2. 压缩请求
+response = requests.post(
+    "https://api.tokesave.com/api/v1/compress",
+    headers={"X-API-Key": API_KEY},
+    json={
+        "model": "gpt-4o",
+        "messages": [{"role": "user", "content": your_data}]
+    }
+)
+
+result = response.json()
+print(f"压缩率: {result['savings_percentage']:.1f}%")
+print(f"节省: ${result['cost_saved_usd']:.4f}")`}</code>
+                </pre>
+              </div>
+            </TabsContent>
+            <TabsContent value="js" className="mt-0">
+              <div className="bg-[#1e1e1e] rounded-xl p-4 overflow-x-auto">
+                <pre className="text-sm text-gray-300">
+                  <code>{`const API_KEY = 'your-api-key';
+
+const response = await fetch('https://api.tokesave.com/api/v1/compress', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-API-Key': API_KEY
+  },
+  body: JSON.stringify({
+    model: 'gpt-4o',
+    messages: [{role: 'user', content: data}]
+  })
+});
+
+const result = await response.json();
+console.log('压缩率:', result.savings_percentage + '%');`}</code>
+                </pre>
+              </div>
+            </TabsContent>
+            <Button className="w-full mt-4 rounded-full" variant="secondary" onClick={() => {
+              const code = `import requests\nAPI_KEY = "your-api-key"\nresponse = requests.post("https://api.tokesave.com/api/v1/compress", headers={"X-API-Key": API_KEY}, json={"model": "gpt-4o", "messages": []})`;
+              navigator.clipboard.writeText(code);
+              alert("代码已复制");
+            }}>
               复制代码
             </Button>
           </Card>
