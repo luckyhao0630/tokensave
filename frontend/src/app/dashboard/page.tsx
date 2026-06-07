@@ -89,9 +89,15 @@ export default function DashboardPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
         <p className="text-red-500">{error}</p>
-        <Link href="/login">
-          <Button>去登录</Button>
-        </Link>
+        {error === "缺少 API Key" ? (
+          <Button onClick={() => router.push("/api-keys")}>
+            创建 API Key
+          </Button>
+        ) : (
+          <Link href="/login">
+            <Button>去登录</Button>
+          </Link>
+        )}
       </div>
     );
   }
