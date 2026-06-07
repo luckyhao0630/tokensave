@@ -178,6 +178,9 @@ class RateLimitService:
         daily_stats = RateLimitService.check_daily_limit(db, user_id)
         monthly_stats = RateLimitService.check_monthly_limit(db, user_id)
         
+        # 获取用户
+        user = db.query(User).filter(User.id == user_id).first()
+        
         # 总token节省
         total_saved = db.query(func.sum(UsageLog.tokens_saved)).filter(
             UsageLog.user_id == user_id,
@@ -194,5 +197,5 @@ class RateLimitService:
             "monthly": monthly_stats,
             "total_tokens_saved": total_saved,
             "total_cost_saved": round(total_cost_saved, 4),
-            "plan": daily_stats,  # 兼容旧格式
+            "plan": user.plan if user else "free",
         }

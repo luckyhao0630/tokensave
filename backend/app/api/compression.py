@@ -1,24 +1,49 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Request, Response
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 import json
 
-from app.models.database import get_db, UsageLog, DailyStats
+from app.models.database import get_db, UsageLog, DailyStats, User
 from app.api.auth import get_api_key_user, get_current_user_dependency
 from app.core.compressor import TokenCompressor, compress as compress_engine
 from app.services.rate_limit import RateLimitService, RateLimitExceeded
 
 # 通用用户依赖（支持API Key或Bearer Token）
-async def get_current_user_or_api_key(
-    api_key_user = Depends(get_api_key_user),
-    token_user = Depends(get_current_user_dependency),
-):
+async def get_current_user_or_api_key(request: Request):
     """支持API Key或Bearer Token认证"""
-    if api_key_user:
-        return api_key_user
-    return token_user
+    db = next(get_db())
+    try:
+        # 先尝试 API Key
+        x_api_key = request.headers.get("X-API-Key")
+        if x_api_key:
+            api_key = verify_api_key(db, x_api_key)
+            if api_key:
+                return api_key.user
+        
+        # 再尝试 Bearer Token
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+            from jose import jwt
+            from app.services.auth import SECRET_KEY, ALGORITHM
+            try:
+                payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+                email = payload.get("sub")
+                if email:
+                    user = db.query(User).filter(User.email == email).first()
+                    if user:
+                        return user
+            except Exception:
+                pass
+    finally:
+        db.close()
+    
+    raise HTTPException(
+        status_code=401,
+        detail="认证失败，请提供有效的 API Key 或 Bearer Token"
+    )
 
 router = APIRouter(prefix="/api/v1", tags=["compression"])
 
