@@ -18,13 +18,14 @@ app.add_middleware(
 )
 
 # 导入路由
-from app.api import auth, compression, billing, proxy, admin
+from app.api import auth, compression, billing, proxy, admin, oauth
 
 app.include_router(auth.router)
 app.include_router(compression.router)
 app.include_router(billing.router)
 app.include_router(proxy.router)
 app.include_router(admin.router)
+app.include_router(oauth.router)
 
 @app.get("/api/v1")
 async def root_api():
