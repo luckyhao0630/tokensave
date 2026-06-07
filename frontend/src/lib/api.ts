@@ -3,7 +3,32 @@
  * 连接后端 FastAPI 服务
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+/**
+ * TokenSaver API Client
+ * 连接后端 FastAPI 服务
+ */
+
+// 自动检测 API 地址
+function getApiBaseUrl(): string {
+  if (typeof window === "undefined") return "http://localhost:8000/api/v1";
+  
+  const hostname = window.location.hostname;
+  
+  // 生产环境
+  if (hostname === "tokesave.com" || hostname === "www.tokesave.com") {
+    return "https://api.tokesave.com/api/v1";
+  }
+  
+  // Vercel 预览环境
+  if (hostname.includes("vercel.app")) {
+    return "https://tokensave-production.up.railway.app/api/v1";
+  }
+  
+  // 本地开发
+  return "http://localhost:8000/api/v1";
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 // 存储 token
 function getToken(): string | null {
