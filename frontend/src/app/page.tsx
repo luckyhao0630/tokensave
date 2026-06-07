@@ -117,6 +117,74 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Quick Start Guide for Beginners */}
+      <section className="py-24 bg-gradient-to-br from-primary/5 to-primary/10">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <Badge variant="secondary" className="mb-4 rounded-full px-4 py-1.5 text-sm font-medium">
+              🎯 新手必看
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+              5分钟快速上手
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              不需要懂技术，跟着步骤做，轻松省钱
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                step: "1",
+                title: "注册账号",
+                desc: "点击右上角「开始使用」，用邮箱注册，30秒完成",
+                icon: "👤",
+                action: "立即注册",
+                href: "/register",
+              },
+              {
+                step: "2",
+                title: "创建 API Key",
+                desc: "进入 Dashboard，点击「创建新密钥」，复制生成的 Key",
+                icon: "🔑",
+                action: "查看教程",
+                href: "/docs",
+              },
+              {
+                step: "3",
+                title: "替换 API 地址",
+                desc: "把代码里的 https://api.openai.com 换成 https://api.tokesave.com/proxy/openai",
+                icon: "🔄",
+                action: "查看代码",
+                href: "/docs",
+              },
+              {
+                step: "4",
+                title: "查看省钱统计",
+                desc: "在 Dashboard 查看每天节省了多少 Token 和费用",
+                icon: "📊",
+                action: "进入 Dashboard",
+                href: "/dashboard",
+              },
+            ].map((item) => (
+              <Card key={item.step} className="p-6 border-0 shadow-sm bg-white relative">
+                <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+                  {item.step}
+                </div>
+                <div className="text-4xl mb-4">{item.icon}</div>
+                <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground mb-4">{item.desc}</p>
+                <Link href={item.href}>
+                  <Button variant="outline" size="sm" className="rounded-full w-full">
+                    {item.action}
+                  </Button>
+                </Link>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section id="features" className="py-24 bg-secondary/50">
         <div className="max-w-7xl mx-auto px-6">
