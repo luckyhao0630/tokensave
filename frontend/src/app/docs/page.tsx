@@ -468,7 +468,7 @@ https://api.tokesave.com/proxy/anthropic/v1
               <div className="space-y-6">
                 {[
                   { step: "1", title: "注册账号", desc: "访问 https://tokesave.com 注册免费账号，1分钟即可完成。" },
-                  { step: "2", title: "创建 API Key", desc: "在 Dashboard 点击"创建新密钥"，复制生成的 API Key。" },
+                  { step: "2", title: "创建 API Key", desc: "在 Dashboard 点击创建新密钥，复制生成的 API Key。" },
                   { step: "3", title: "发送请求", desc: "在请求头添加 X-API-Key，发送消息到 /api/v1/compress，立即获得压缩结果。" },
                   { step: "4", title: "查看省钱统计", desc: "在 Dashboard 查看节省的 Token 数量和费用，优化你的使用策略。" },
                 ].map((item) => (

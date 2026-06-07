@@ -392,8 +392,8 @@ response = requests.post(
 )
 
 result = response.json()
-print(f"压缩率: {result['savings_percentage']:.1f}%")
-print(f"节省: ${result['cost_saved_usd']:.4f}")`}</code>
+print("压缩率: " + str(result['savings_percentage']) + "%")
+print("节省: $" + str(result['cost_saved_usd']))`}</code>
                 </pre>
               </div>
             </TabsContent>
