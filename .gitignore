@@ -1,0 +1,25 @@
+# TokenSaver
+
+# headroom-core (git submodule)
+headroom-core/
+
+# 环境变量
+.env
+.env.local
+
+# 数据库
+tokensaver.db
+*.db
+
+# Docker
+*.pid
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
