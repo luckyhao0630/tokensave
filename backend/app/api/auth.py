@@ -159,3 +159,50 @@ async def delete_api_key(key_id: int, current_user: User = Depends(get_current_u
     api_key.is_active = False
     db.commit()
     return {"message": "API Key 已删除"}
+
+# 更新用户信息
+class UpdateUserRequest(BaseModel):
+    name: Optional[str] = None
+
+@router.put("/auth/me")
+async def update_me(
+    request: UpdateUserRequest,
+    current_user: User = Depends(get_current_user_dependency),
+    db: Session = Depends(get_db)
+):
+    """更新用户信息"""
+    if request.name is not None:
+        current_user.name = request.name
+    db.commit()
+    db.refresh(current_user)
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "name": current_user.name,
+        "plan": current_user.plan,
+        "created_at": current_user.created_at,
+    }
+
+# 修改密码
+class PasswordChangeRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+@router.put("/auth/password")
+async def change_password(
+    request: PasswordChangeRequest,
+    current_user: User = Depends(get_current_user_dependency),
+    db: Session = Depends(get_db)
+):
+    """修改密码"""
+    from app.services.auth import verify_password, get_password_hash
+    
+    if not current_user.hashed_password:
+        raise HTTPException(status_code=400, detail="OAuth用户无法修改密码")
+    
+    if not verify_password(request.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="当前密码错误")
+    
+    current_user.hashed_password = get_password_hash(request.new_password)
+    db.commit()
+    return {"message": "密码修改成功"}
