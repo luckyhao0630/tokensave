@@ -10,13 +10,13 @@
 
 // 自动检测 API 地址
 function getApiBaseUrl(): string {
-  if (typeof window === "undefined") return "http://localhost:8000/api/v1";
+  if (typeof window === "undefined") return "https://tokensave-production.up.railway.app/api/v1";
   
   const hostname = window.location.hostname;
   
-  // 生产环境
+  // 生产环境（域名未生效前用 Railway 直接地址）
   if (hostname === "tokesave.com" || hostname === "www.tokesave.com") {
-    return "https://api.tokesave.com/api/v1";
+    return "https://tokensave-production.up.railway.app/api/v1";
   }
   
   // Vercel 预览环境
