@@ -6,9 +6,19 @@ from datetime import datetime
 import json
 
 from app.models.database import get_db, UsageLog, DailyStats
-from app.api.auth import get_api_key_user
+from app.api.auth import get_api_key_user, get_current_user_dependency
 from app.core.compressor import TokenCompressor, compress as compress_engine
 from app.services.rate_limit import RateLimitService, RateLimitExceeded
+
+# 通用用户依赖（支持API Key或Bearer Token）
+async def get_current_user_or_api_key(
+    api_key_user = Depends(get_api_key_user),
+    token_user = Depends(get_current_user_dependency),
+):
+    """支持API Key或Bearer Token认证"""
+    if api_key_user:
+        return api_key_user
+    return token_user
 
 router = APIRouter(prefix="/api/v1", tags=["compression"])
 
@@ -142,7 +152,7 @@ async def proxy_compress(
 
 @router.get("/usage/stats")
 async def get_usage_stats(
-    current_user = Depends(get_api_key_user),
+    current_user = Depends(get_current_user_or_api_key),
     db: Session = Depends(get_db)
 ):
     """获取用户用量统计"""
@@ -184,7 +194,7 @@ async def get_usage_stats(
 @router.get("/usage/daily")
 async def get_daily_usage(
     days: int = 7,
-    current_user = Depends(get_api_key_user),
+    current_user = Depends(get_current_user_or_api_key),
     db: Session = Depends(get_db)
 ):
     """获取最近N天的每日用量"""
