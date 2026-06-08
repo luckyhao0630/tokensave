@@ -1,21 +1,9 @@
+import Navbar from "@/components/navbar";
+
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-white">
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-            </div>
-            <span className="font-semibold text-lg tracking-tight">TokenSaver</span>
-          </a>
-          <div className="flex items-center gap-4 text-sm">
-            <a href="/terms" className="text-muted-foreground hover:text-foreground">服务条款</a>
-            <a href="/refund" className="text-muted-foreground hover:text-foreground">退款政策</a>
-            <a href="/" className="text-primary hover:underline">返回首页</a>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
       <div className="max-w-3xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-bold mb-6">隐私政策</h1>
         <div className="prose prose-sm max-w-none">
