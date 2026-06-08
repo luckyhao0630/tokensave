@@ -140,6 +140,7 @@ export const apiKeyApi = {
 // 套餐 & 计费
 export const billingApi = {
   getPlans: () => apiRequest("/plans"),
+  getPromoStatus: () => apiRequest("/promo"),
   getCurrentPlan: () => apiRequest("/billing/current"),
   createCheckout: (plan: string, interval: string = "monthly") =>
     apiRequest("/billing/checkout", {

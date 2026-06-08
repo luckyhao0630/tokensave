@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { getToken, removeToken, API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from "react";
-import { Zap, Loader2, LogOut, TrendingDown, BarChart3, DollarSign, Key, FileText } from "lucide-react";
+import { Zap, Loader2, LogOut, TrendingDown, BarChart3, DollarSign, Key, FileText, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -144,6 +144,15 @@ export default function DashboardPage() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* 限时免费活动提示 */}
+        <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl flex items-center gap-3">
+          <Sparkles className="w-5 h-5 text-yellow-600" />
+          <div>
+            <p className="font-semibold text-yellow-800">🎉 限时免费活动进行中</p>
+            <p className="text-sm text-yellow-700">所有 Pro 功能免费体验，7月8日后恢复原价</p>
+          </div>
+        </div>
+
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
         
         {/* 统计卡片 */}

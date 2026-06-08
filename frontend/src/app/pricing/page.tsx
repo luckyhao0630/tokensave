@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { billingApi, getToken } from "@/lib/api";
 import { useEffect, useState } from "react";
-import { Zap, Check, Loader2, ArrowLeft } from "lucide-react";
+import { Zap, Check, Loader2, ArrowLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar";
@@ -104,6 +104,18 @@ export default function PricingPage() {
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-6 py-12">
+        {/* 限时免费活动横幅 */}
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-full shadow-lg">
+            <Sparkles className="w-5 h-5" />
+            <span className="font-semibold">🎉 限时免费活动</span>
+            <span className="text-sm opacity-90">所有功能免费体验，名额有限！</span>
+            <Link href="/register">
+              <Button size="sm" variant="secondary" className="ml-2 rounded-full">立即参与</Button>
+            </Link>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-semibold tracking-tight mb-4">
@@ -199,7 +211,7 @@ export default function PricingPage() {
                   ? "免费使用"
                   : key === "enterprise"
                   ? "联系销售"
-                  : "开始试用"}
+                  : "🎉 免费体验"}
               </Button>
 
               {key === "pro" && (

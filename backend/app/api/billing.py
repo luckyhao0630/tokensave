@@ -111,7 +111,37 @@ async def get_plans():
     return {"plans": plans, "currency": "USD"}
 
 
-@router.get("/billing/current")
+# 限时免费活动配置（后端控制开关）
+PROMO_CONFIG = {
+    "enabled": True,  # 活动开关
+    "name": "🎉 限时免费活动",
+    "description": "所有用户免费体验 Pro 版全部功能",
+    "free_features": ["pro", "team"],  # 限时开放的套餐
+    "max_users": 1000,  # 名额限制
+    "current_users": 0,  # 当前参与人数（实际应从数据库查询）
+    "start_date": "2026-06-08",
+    "end_date": "2026-07-08",  # 30天后结束
+    "message": "限时免费体验中，所有功能全部开放！"
+}
+
+
+@router.get("/promo")
+async def get_promo_status():
+    """获取限时免费活动状态"""
+    # 检查是否达到名额限制
+    remaining = max(0, PROMO_CONFIG["max_users"] - PROMO_CONFIG["current_users"])
+    
+    return {
+        "enabled": PROMO_CONFIG["enabled"] and remaining > 0,
+        "name": PROMO_CONFIG["name"],
+        "description": PROMO_CONFIG["description"],
+        "message": PROMO_CONFIG["message"],
+        "max_users": PROMO_CONFIG["max_users"],
+        "remaining_slots": remaining,
+        "start_date": PROMO_CONFIG["start_date"],
+        "end_date": PROMO_CONFIG["end_date"],
+        "all_features_free": True,
+    }
 async def get_current_plan(
     current_user: User = Depends(get_current_user_dependency),
     db: Session = Depends(get_db)

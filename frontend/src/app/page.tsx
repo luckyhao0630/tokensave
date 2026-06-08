@@ -4,18 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Zap, Shield, BarChart3, Code, Globe, ChevronRight, CheckCircle2, Star } from "lucide-react";
+import { ArrowRight, Zap, Shield, BarChart3, Code, Globe, ChevronRight, CheckCircle2, Star, Clock, Sparkles } from "lucide-react";
 import { AnimatedNumber } from "@/components/animated-number";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { getToken } from "@/lib/api";
+import { getToken, billingApi } from "@/lib/api";
 import { useEffect, useState } from "react";
 
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [promo, setPromo] = useState<any>(null);
 
   useEffect(() => {
     setIsLoggedIn(!!getToken());
+    billingApi.getPromoStatus().then(setPromo).catch(() => {});
   }, []);
 
   return (
@@ -70,6 +72,22 @@ export default function HomePage() {
             <Badge variant="secondary" className="mb-6 rounded-full px-4 py-1.5 text-sm font-medium">
               🚀 基于 GitHub 14k+ Stars 开源项目
             </Badge>
+            
+            {/* 限时免费活动横幅 */}
+            {promo?.enabled && (
+              <motion.div
+                className="mb-6 inline-flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-full shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                onClick={() => window.location.href = '/register'}
+              >
+                <Sparkles className="w-5 h-5" />
+                <span className="font-semibold">{promo.name}</span>
+                <span className="text-sm opacity-90">{promo.message}</span>
+                <ArrowRight className="w-4 h-4" />
+              </motion.div>
+            )}
           </motion.div>
 
           <motion.h1

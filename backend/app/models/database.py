@@ -109,6 +109,28 @@ class UsageLog(Base):
     user = relationship("User", back_populates="usage_logs")
     api_key = relationship("ApiKey", back_populates="usage_logs")
 
+class ContactMessage(Base):
+    __tablename__ = "contact_messages"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    
+    name = Column(String(100), nullable=True)
+    email = Column(String(255), nullable=True)
+    subject = Column(String(200), nullable=False)
+    message = Column(Text, nullable=False)
+    type = Column(String(50), default="support")  # support, feedback, bug, feature
+    status = Column(String(50), default="new")  # new, replied, closed
+    
+    reply = Column(Text, nullable=True)
+    replied_at = Column(DateTime, nullable=True)
+    replied_by = Column(Integer, nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    user = relationship("User")
+
+
 class Subscription(Base):
     __tablename__ = "subscriptions"
     

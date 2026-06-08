@@ -28,6 +28,7 @@ export default function Navbar() {
           <a href="/#features" className="hover:text-foreground transition-colors">功能</a>
           <a href="/#pricing" className="hover:text-foreground transition-colors">定价</a>
           <Link href="/docs" className="hover:text-foreground transition-colors">文档</Link>
+          <Link href="/contact" className="hover:text-foreground transition-colors">联系</Link>
         </div>
         <div className="flex items-center gap-3">
           {isLoggedIn ? (
