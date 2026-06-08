@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import I18nProvider from "@/components/i18n-provider";
 
 export const metadata: Metadata = {
-  title: "TokenSaver - 节省 60-95% 的 LLM 费用",
-  description: "智能压缩 LLM Token，让 AI 开发成本降低一半以上。支持 OpenAI、Anthropic、DeepSeek 等主流模型。",
+  title: "TokenSaver - Reduce LLM Costs by 60-95%",
+  description: "Smart LLM Token Compression. Reduce AI development costs by half. Supports OpenAI, Anthropic, DeepSeek and more.",
 };
 
 export default function RootLayout({
@@ -12,9 +13,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className="h-full antialiased">
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        {children}
+        <I18nProvider>{children}</I18nProvider>
       </body>
     </html>
   );

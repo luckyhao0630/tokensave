@@ -6,10 +6,13 @@ import Link from "next/link";
 import { getToken } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import LanguageSwitcher from "./language-switcher";
+import { useTranslation } from "react-i18next";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsLoggedIn(!!getToken());
@@ -25,27 +28,28 @@ export default function Navbar() {
           <span className="font-semibold text-lg tracking-tight">TokenSaver</span>
         </Link>
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-          <a href="/#features" className="hover:text-foreground transition-colors">功能</a>
-          <a href="/#pricing" className="hover:text-foreground transition-colors">定价</a>
-          <Link href="/guide" className="hover:text-foreground transition-colors">教程</Link>
-          <Link href="/docs" className="hover:text-foreground transition-colors">文档</Link>
-          <Link href="/contact" className="hover:text-foreground transition-colors">联系</Link>
+          <a href="/#features" className="hover:text-foreground transition-colors">{t('nav.features')}</a>
+          <a href="/#pricing" className="hover:text-foreground transition-colors">{t('nav.pricing')}</a>
+          <Link href="/guide" className="hover:text-foreground transition-colors">{t('nav.guide')}</Link>
+          <Link href="/docs" className="hover:text-foreground transition-colors">{t('nav.docs')}</Link>
+          <Link href="/contact" className="hover:text-foreground transition-colors">{t('nav.contact')}</Link>
         </div>
         <div className="flex items-center gap-3">
+          <LanguageSwitcher />
           {isLoggedIn ? (
             <Link href="/dashboard">
               <Button size="sm" className="rounded-full px-4">
-                进入 Dashboard
+                {t('nav.dashboard')}
               </Button>
             </Link>
           ) : (
             <>
               <Link href="/login">
-                <Button variant="ghost" size="sm">登录</Button>
+                <Button variant="ghost" size="sm">{t('nav.login')}</Button>
               </Link>
               <Link href="/register">
                 <Button size="sm" className="rounded-full px-4">
-                  开始使用
+                  {t('nav.start')}
                 </Button>
               </Link>
             </>
