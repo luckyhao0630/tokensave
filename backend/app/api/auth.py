@@ -82,10 +82,32 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
     user = create_user(db, email=request.email, password=request.password)
     return user
 
-# 用户登录
+# 登录请求模型（JSON）
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+# 用户登录 - 支持 OAuth2 表单和 JSON 两种方式
 @router.post("/auth/login")
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = authenticate_user(db, form_data.username, form_data.password)
+async def login(
+    request: LoginRequest = None,
+    form_data: OAuth2PasswordRequestForm = None,
+    db: Session = Depends(get_db)
+):
+    # 优先尝试 JSON 方式
+    if request:
+        email = request.email
+        password = request.password
+    elif form_data:
+        email = form_data.username
+        password = form_data.password
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="请提供 email 和 password 字段"
+        )
+    
+    user = authenticate_user(db, email, password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
