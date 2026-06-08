@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+import json
 
 from app.models.database import get_db, User, ContactMessage
 from app.api.auth import get_current_user_dependency
@@ -16,6 +17,45 @@ class ContactRequest(BaseModel):
     subject: str
     message: str
     type: str = "support"  # support, feedback, bug, feature
+
+
+def send_feishu_notification(message_data: dict):
+    """发送飞书通知（简单版，不阻塞主流程）"""
+    import os
+    import urllib.request
+    import urllib.parse
+    
+    # 从环境变量获取飞书 Webhook（如果有配置）
+    webhook_url = os.getenv("FEISHU_WEBHOOK_URL", "")
+    
+    if not webhook_url:
+        return
+    
+    try:
+        data = {
+            "msg_type": "text",
+            "content": {
+                "text": f"🚨 新用户反馈\n\n" + 
+                        f"类型: {message_data.get('type', 'support')}\n" +
+                        f"姓名: {message_data.get('name', '匿名')}\n" +
+                        f"邮箱: {message_data.get('email', '无')}\n" +
+                        f"主题: {message_data.get('subject', '')}\n" +
+                        f"内容: {message_data.get('message', '')[:500]}\n\n" +
+                        f"时间: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC"
+            }
+        }
+        
+        req = urllib.request.Request(
+            webhook_url,
+            data=json.dumps(data).encode('utf-8'),
+            headers={'Content-Type': 'application/json'},
+            method='POST'
+        )
+        
+        with urllib.request.urlopen(req, timeout=5) as response:
+            pass
+    except Exception as e:
+        print(f"[Notification] 飞书通知失败: {e}")
 
 
 @router.post("/contact")
@@ -42,13 +82,33 @@ async def submit_contact(
     db.commit()
     db.refresh(msg)
     
-    # TODO: 发送通知到管理员（飞书/邮件）
-    # send_notification_to_admin(msg)
+    # 发送通知（后台异步，不阻塞）
+    send_feishu_notification({
+        "type": request.type,
+        "name": request.name or (current_user.name if current_user else "匿名"),
+        "email": request.email or (current_user.email if current_user else None),
+        "subject": request.subject,
+        "message": request.message,
+    })
+    
+    # 自动回复常见问题
+    auto_reply = ""
+    lower_msg = request.message.lower() + request.subject.lower()
+    
+    if "api" in lower_msg or "key" in lower_msg or "对接" in lower_msg:
+        auto_reply = "\n\n【自动回复】关于 API Key 对接问题，请查看我们的教程：https://www.tokesave.com/guide"
+    elif "压缩" in lower_msg or "compress" in lower_msg or "token" in lower_msg:
+        auto_reply = "\n\n【自动回复】关于压缩算法和 Token 节省问题，请查看文档：https://www.tokesave.com/docs"
+    elif "价格" in lower_msg or "收费" in lower_msg or "付费" in lower_msg or "pricing" in lower_msg:
+        auto_reply = "\n\n【自动回复】目前限时免费活动中！所有 Pro 功能免费体验至 2026-07-08。"
+    elif "退款" in lower_msg or "refund" in lower_msg:
+        auto_reply = "\n\n【自动回复】退款政策请查看：https://www.tokesave.com/refund"
     
     return {
         "success": True,
         "message_id": msg.id,
-        "message": "消息已提交，我们会尽快回复您"
+        "message": "消息已提交，我们会尽快回复您" + auto_reply,
+        "auto_reply": auto_reply != ""
     }
 
 
