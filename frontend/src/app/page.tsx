@@ -34,6 +34,7 @@ export default function HomePage() {
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <a href="#features" className="hover:text-foreground transition-colors">功能</a>
             <a href="#pricing" className="hover:text-foreground transition-colors">定价</a>
+            <Link href="/guide" className="hover:text-foreground transition-colors">教程</Link>
             <Link href="/docs" className="hover:text-foreground transition-colors">文档</Link>
           </div>
           <div className="flex items-center gap-3">
