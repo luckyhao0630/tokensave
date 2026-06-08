@@ -39,7 +39,13 @@ export default function RefundPage() {
           <p className="mb-4">退款将原路返回至您的支付账户，处理时间取决于支付渠道，通常为 5-10 个工作日。</p>
           
           <h2 className="text-xl font-semibold mt-6 mb-3">5. 联系我们</h2>
-          <p>退款问题请联系 support@tokensave.com</p>
+          <p className="mb-4">退款问题请联系：</p>
+          <div className="flex items-center gap-3">
+            <a href="/contact" className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              联系客服
+            </a>
+          </div>
         </div>
       </div>
     </div>

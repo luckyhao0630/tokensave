@@ -34,7 +34,13 @@ export default function PrivacyPage() {
           <p className="mb-4">我们使用 Paddle 处理支付，不存储信用卡信息。Paddle 负责处理全球税务合规。</p>
           
           <h2 className="text-xl font-semibold mt-6 mb-3">5. 联系我们</h2>
-          <p>如有隐私问题请联系 privacy@tokensave.com</p>
+          <p className="mb-4">如有隐私问题请联系：</p>
+          <div className="flex items-center gap-3">
+            <a href="/contact" className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              联系客服
+            </a>
+          </div>
         </div>
       </div>
     </div>
