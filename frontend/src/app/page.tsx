@@ -10,10 +10,12 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { getToken, billingApi } from "@/lib/api";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [promo, setPromo] = useState<any>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsLoggedIn(!!getToken());
@@ -32,28 +34,26 @@ export default function HomePage() {
             <span className="font-semibold text-lg tracking-tight">TokenSaver</span>
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-            <a href="#features" className="hover:text-foreground transition-colors">功能</a>
-            <a href="#pricing" className="hover:text-foreground transition-colors">定价</a>
-            <Link href="/guide" className="hover:text-foreground transition-colors">教程</Link>
-            <Link href="/docs" className="hover:text-foreground transition-colors">文档</Link>
+            <a href="#features" className="hover:text-foreground transition-colors">{t('nav.features')}</a>
+            <a href="#pricing" className="hover:text-foreground transition-colors">{t('nav.pricing')}</a>
+            <Link href="/guide" className="hover:text-foreground transition-colors">{t('nav.guide')}</Link>
+            <Link href="/docs" className="hover:text-foreground transition-colors">{t('nav.docs')}</Link>
           </div>
           <div className="flex items-center gap-3">
             {isLoggedIn ? (
               <Link href="/dashboard">
                 <Button size="sm" className="rounded-full px-4">
-                  进入 Dashboard
-                  <ArrowRight className="w-4 h-4 ml-1" />
+                  {t('nav.dashboard')}
                 </Button>
               </Link>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" size="sm">登录</Button>
+                  <Button variant="ghost" size="sm">{t('nav.login')}</Button>
                 </Link>
                 <Link href="/register">
                   <Button size="sm" className="rounded-full px-4">
-                    开始使用
-                    <ArrowRight className="w-4 h-4 ml-1" />
+                    {t('nav.start')}
                   </Button>
                 </Link>
               </>
@@ -71,7 +71,7 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
           >
             <Badge variant="secondary" className="mb-6 rounded-full px-4 py-1.5 text-sm font-medium">
-              🚀 基于 GitHub 14k+ Stars 开源项目
+              🚀 {t('hero.badge')}
             </Badge>
             
             {/* 限时免费活动横幅 */}
@@ -97,9 +97,9 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
           >
-            让 LLM 费用
+            {t('hero.title')}
             <br />
-            <span className="text-primary">降低 60-95%</span>
+            <span className="text-primary">{t('hero.highlight')}</span>
           </motion.h1>
 
           <motion.p
@@ -108,9 +108,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            智能压缩 Token，不改变 AI 回答质量。
-            <br className="hidden md:block" />
-            一行代码接入，立即节省一半以上成本。
+            {t('hero.subtitle')}
           </motion.p>
 
           <motion.div
@@ -121,13 +119,13 @@ export default function HomePage() {
           >
             <Link href="/register">
               <Button size="lg" className="rounded-full px-8 h-12 text-base">
-                免费开始
+                {t('hero.cta_primary')}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
             <Link href="/docs">
               <Button variant="outline" size="lg" className="rounded-full px-8 h-12 text-base">
-                查看文档
+                {t('hero.cta_secondary')}
               </Button>
             </Link>
           </motion.div>
@@ -140,9 +138,9 @@ export default function HomePage() {
             transition={{ duration: 0.7, delay: 0.5 }}
           >
             {[
-              { value: 85, suffix: "%", label: "平均压缩率" },
-              { value: 10000, suffix: "+", label: "开发者使用" },
-              { value: 50, suffix: "%", label: "费用节省" },
+              { value: 85, suffix: "%", label: t('hero.stat1') },
+              { value: 10000, suffix: "+", label: t('hero.stat2') },
+              { value: 50, suffix: "%", label: t('hero.stat3') },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-3xl md:text-4xl font-bold tracking-tight">
