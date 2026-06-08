@@ -34,16 +34,20 @@ export default function PricingPage() {
   const router = useRouter();
   const [plans, setPlans] = useState<PlansData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [interval, setInterval] = useState<"monthly" | "yearly">("monthly");
 
   useEffect(() => {
     async function loadPlans() {
       try {
+        console.log("[Pricing] Loading plans...");
         const data = await billingApi.getPlans();
+        console.log("[Pricing] Plans loaded:", data);
         setPlans(data);
-      } catch (err) {
-        console.error("Failed to load plans", err);
+      } catch (err: any) {
+        console.error("[Pricing] Failed to load plans:", err);
+        setError(err.message || "加载失败");
       } finally {
         setLoading(false);
       }
@@ -75,6 +79,19 @@ export default function PricingPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button onClick={() => window.location.reload()} className="text-primary hover:underline">
+            刷新重试
+          </button>
+        </div>
       </div>
     );
   }

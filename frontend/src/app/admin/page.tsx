@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { removeToken } from "@/lib/api";
+import { removeToken, API_BASE_URL } from "@/lib/api";
 
 interface DashboardData {
   total_users: number;
@@ -93,13 +93,13 @@ export default function AdminPage() {
   }, [router]);
 
   function getApiBaseUrl(): string {
-    if (typeof window === "undefined") return "https://tokensave-production.up.railway.app/api/v1";
+    if (typeof window === "undefined") return API_BASE_URL;
     const hostname = window.location.hostname;
     if (hostname === "tokesave.com" || hostname === "www.tokesave.com") {
-      return "https://tokensave-production.up.railway.app/api/v1";
+      return API_BASE_URL;
     }
     if (hostname.includes("vercel.app")) {
-      return "https://tokensave-production.up.railway.app/api/v1";
+      return API_BASE_URL;
     }
     return "http://localhost:8000/api/v1";
   }

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { getToken, removeToken } from "@/lib/api";
+import { getToken, removeToken, API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { User, Zap, LogOut, Key, CreditCard, Loader2 } from "lucide-react";
@@ -65,13 +65,13 @@ export default function ProfilePage() {
   }, [router]);
 
   function getApiBaseUrl(): string {
-    if (typeof window === "undefined") return "https://tokensave-production.up.railway.app/api/v1";
+    if (typeof window === "undefined") return API_BASE_URL;
     const hostname = window.location.hostname;
     if (hostname === "tokesave.com" || hostname === "www.tokesave.com") {
-      return "https://tokensave-production.up.railway.app/api/v1";
+      return API_BASE_URL;
     }
     if (hostname.includes("vercel.app")) {
-      return "https://tokensave-production.up.railway.app/api/v1";
+      return API_BASE_URL;
     }
     return "http://localhost:8000/api/v1";
   }

@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getToken, removeToken } from "@/lib/api";
+import { getToken, removeToken, API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { Zap, Loader2, LogOut } from "lucide-react";
 import Link from "next/link";
@@ -23,7 +23,7 @@ export default function DashboardPage() {
     }
 
     // 获取用户信息
-    fetch("https://tokensave-production.up.railway.app/api/v1/auth/me", {
+    fetch(`${API_BASE_URL}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
