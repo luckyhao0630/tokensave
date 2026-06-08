@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Zap, Check, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Navbar from "@/components/navbar";
 
 interface Plan {
   name: string;
@@ -100,23 +101,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-secondary/30">
-      {/* Nav */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-semibold text-lg tracking-tight">TokenSaver</span>
-          </Link>
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              返回 Dashboard
-            </Button>
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="max-w-5xl mx-auto px-6 py-12">
         {/* Header */}

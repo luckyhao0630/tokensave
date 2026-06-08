@@ -7,7 +7,7 @@ import json
 
 from app.models.database import get_db, UsageLog, DailyStats, User
 from app.api.auth import get_api_key_user, get_current_user_dependency
-from app.core.compressor import TokenCompressor, compress as compress_engine
+from app.core.compressor_v2 import TokenCompressor, compress as compress_v2
 from app.services.rate_limit import RateLimitService, RateLimitExceeded
 
 # 通用用户依赖（支持API Key或Bearer Token）
@@ -65,10 +65,11 @@ class CompressResponse(BaseModel):
     transforms_applied: List[str]
     cost_saved_usd: float
 
-# 压缩核心逻辑（简化版，后续替换为headroom真实逻辑）
-def compress_messages(messages: List[Dict], model: str = "gpt-4o") -> Dict:
-    """调用真实压缩引擎"""
-    result = compress_engine(messages, model)
+# 压缩核心逻辑 - V2混合引擎
+def compress_messages(messages: List[Dict], model: str = "gpt-4o", user_plan: str = "free", enable_llm: bool = False) -> Dict:
+    """调用V2混合压缩引擎"""
+    compressor = TokenCompressor(enable_llm=enable_llm)
+    result = compressor.compress_messages(messages, model, user_plan)
     return {
         "compressed_messages": result.compressed_messages,
         "tokens_before": result.tokens_before,
@@ -76,6 +77,9 @@ def compress_messages(messages: List[Dict], model: str = "gpt-4o") -> Dict:
         "savings_percentage": result.compression_ratio * 100,
         "transforms_applied": result.transforms_applied,
         "cost_saved_usd": result.cost_saved_usd,
+        "llm_cost_usd": result.llm_cost_usd,
+        "cache_hit": result.cache_hit,
+        "processing_time_ms": result.processing_time_ms,
         "content_type": result.content_type,
     }
 

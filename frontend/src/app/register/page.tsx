@@ -55,12 +55,12 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-4">
-            <Button variant="outline" className="w-full rounded-full h-11">
-              使用 GitHub 注册
+            <Button variant="outline" className="w-full rounded-full h-11 opacity-50 cursor-not-allowed" disabled>
+              使用 GitHub 注册 (即将上线)
             </Button>
-            <Button variant="outline" className="w-full rounded-full h-11">
+            <Button variant="outline" className="w-full rounded-full h-11 opacity-50 cursor-not-allowed" disabled>
               <Mail className="w-4 h-4 mr-2" />
-              使用 Google 注册
+              使用 Google 注册 (即将上线)
             </Button>
           </div>
 

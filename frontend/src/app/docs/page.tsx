@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Zap, Copy, CheckCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import Navbar from "@/components/navbar";
 
 export default function DocsPage() {
   const [copied, setCopied] = useState<string | null>(null);
@@ -130,27 +131,7 @@ https://api.tokesave.com/proxy/anthropic/v1
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Nav */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-semibold text-lg tracking-tight">TokenSaver</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Dashboard
-            </Link>
-            <Link href="/login">
-              <Button size="sm" className="rounded-full">
-                开始使用
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="max-w-7xl mx-auto px-6 py-12 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
