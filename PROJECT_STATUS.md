@@ -1,131 +1,65 @@
-# TokenSaver 项目状态报告
+# TokenSaver 项目状态 - 2026-06-08
 
-**日期**: 2026-06-07
-**汇报人**: 濠仔
-**状态**: 开发完成，部署中
+## 已完成修复（本地未推送）
 
----
+### 后端修复
+1. **登录API** - 同时支持 JSON (email+password) 和 OAuth2 表单 (username+password)
+2. **刷新Token API** - 支持 JSON body 传入 refresh_token
 
-## 已完成功能（100%）
+### 前端修复
+1. **注册页面** - 添加完整的客户端表单处理和提交逻辑
+2. **Dashboard** - 修复硬编码 API URL（使用 api.tokesave.com）
+3. **Profile** - 修复硬编码 API URL
+4. **Admin** - 修复硬编码 API URL
+5. **Pricing** - 添加错误处理和日志
 
-### 1. 核心功能
-- ✅ 压缩引擎（6种算法，85%+压缩率）
-- ✅ Proxy模式（OpenAI/Anthropic/DeepSeek）
-- ✅ 用户系统（注册/登录/Token管理）
-- ✅ API Key管理（创建/删除/验证）
-- ✅ 限流系统（4种套餐：Free/Pro/Team/Enterprise）
-- ✅ 用量统计（日/月/配额）
+## 部署状态
 
-### 2. 前端页面
-- ✅ 首页（Landing Page + 新手教程）
-- ✅ 登录/注册页面
-- ✅ Dashboard（API Key管理/用量统计）
-- ✅ 文档页（可点击左侧菜单）
-- ✅ 定价页
-- ✅ 个人中心（修改密码/退出）
-- ✅ 管理后台（深色主题/统计/用户管理）
-- ✅ 后台登录页面（🔐 标识）
+### 已部署 ✅
+- **前端**: https://www.tokesave.com (Vercel)
+- **后端**: https://api.tokesave.com (Railway)
+- **数据库**: Neon PostgreSQL
+- **DNS**: Namecheap (tokesave.com, www.tokesave.com, api.tokesave.com)
 
-### 3. 后端API（20个端点）
-- ✅ 注册/登录/刷新Token
-- ✅ 用户信息/更新/密码修改
-- ✅ API Key管理
-- ✅ 压缩API
-- ✅ 用量统计（Bearer/API Key）
-- ✅ 套餐查询
-- ✅ Proxy Providers
-- ✅ 管理后台
-- ✅ OAuth（GitHub/Google）- 代码完成
+### 测试通过 ✅
+- 注册 API ✅
+- 登录 API ✅
+- 用户信息 API ✅
+- 压缩 API ✅
+- 套餐查询 API ✅
+- 代理 Provider API ✅
+- API Key 管理 API ✅
+- 用量统计 API ✅
+- 管理后台 API ✅
+- 文档页 API ✅
 
-### 4. 部署
-- ✅ Railway 后端（https://tokensave-production.up.railway.app）
-- ✅ Vercel 前端（https://tokesave.com）
-- ✅ Neon 数据库
-- ✅ Namecheap 域名（tokesave.com）
-- ✅ DNS 配置（A记录 + CNAME）
+### 前端页面访问 ✅
+- 首页 ✅
+- 登录页 ✅
+- 注册页 ✅
+- Dashboard ✅
+- Pricing ✅
+- Docs ✅
+- Profile ✅
+- Admin ✅
 
-### 5. 测试
-- ✅ 本地测试脚本（test_api.py）
-- ✅ 生产环境测试脚本（full_test.sh）
-- ✅ 压力测试脚本（stress_test.sh）
-- ✅ 系统测试脚本（test_system.py）
+## 待解决问题
 
----
+### 🔴 高优先级
+1. **GitHub推送失败** - Token可能过期，需要重新生成或配置SSH密钥
+2. **Railway重新部署** - 后端修复需要重新部署才能生效
+3. **Vercel重新部署** - 前端修复需要重新部署才能生效
 
-## 待解决问题（明天完成）
+### 🟡 中优先级
+1. **pricing/dashboard页面只显示loading** - 需要浏览器JS执行，可能与API调用有关
+2. **刷新Token未测试** - 后端代码已修复但未部署
 
-### 1. Vercel 部署问题 ⚠️
-**问题**: GitHub 推送超时，Vercel 未部署最新代码
-**解决**: 
-- 方案A：等网络恢复后推送
-- 方案B：手动在 Vercel 点击 Redeploy
-- 方案C：使用 GitHub Actions 自动部署
+### 🟢 低优先级
+1. **Stripe/LemonSqueezy支付配置** - 待鹏哥提供账号
+2. **OAuth配置** - 待鹏哥提供GitHub/Google Client ID
 
-### 2. DNS 配置 ⚠️
-**问题**: api.tokesave.com 无法访问
-**解决**: 在 Namecheap 添加 CNAME 记录：
-```
-Type: CNAME
-Host: api
-Value: tokensave-production.up.railway.app
-```
-
-### 3. OAuth 环境变量 ⚠️
-**问题**: GitHub/Google 注册需要配置 Client ID
-**解决**: 
-- GitHub: https://github.com/settings/developers → OAuth Apps
-- Google: https://console.cloud.google.com → APIs & Services → Credentials
-
-### 4. LemonSqueezy 支付 ⚠️
-**问题**: 支付系统未配置
-**解决**: 
-- 注册 LemonSqueezy
-- 连接 PayPal
-- 创建产品（Pro/Team/Enterprise）
-- 配置 Webhook
-
----
-
-## 明天工作计划
-
-### 上午（优先级）
-1. 修复 Vercel 部署（确保所有页面正常访问）
-2. 配置 DNS（api.tokesave.com）
-3. 全流程测试（注册 → 登录 → 创建API Key → 压缩 → 查看统计）
-
-### 下午
-4. OAuth 配置（GitHub/Google Client ID）
-5. LemonSqueezy 支付配置
-6. 系统优化（Redis缓存/性能监控）
-
-### 晚上
-7. 自动化测试运行
-8. 修复所有 Bug
-9. 最终验收测试
-
----
-
-## 访问地址
-
-- 前端: https://tokesave.com
-- 后端: https://tokensave-production.up.railway.app
-- API文档: https://tokensave-production.up.railway.app/docs
-- 管理后台: https://tokesave.com/admin/login
-
-## 测试账号
-
-- 邮箱: test@example.com
-- 密码: test123456
-
-## 技术栈
-
-- 前端: Next.js 14 + Tailwind CSS + shadcn/ui
-- 后端: FastAPI + SQLAlchemy + JWT
-- 数据库: PostgreSQL (Neon)
-- 部署: Vercel + Railway
-- 支付: LemonSqueezy + PayPal
-- 监控: Railway自带监控
-
----
-
-**备注**: 鹏哥今天休息，明天验收。所有代码已准备好，等部署完成后即可使用。
+## 下一步行动
+1. 修复GitHub推送问题
+2. 重新部署Railway后端
+3. 重新部署Vercel前端
+4. 全面测试验证

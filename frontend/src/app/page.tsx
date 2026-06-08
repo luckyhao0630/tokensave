@@ -8,8 +8,16 @@ import { ArrowRight, Zap, Shield, BarChart3, Code, Globe, ChevronRight, CheckCir
 import { AnimatedNumber } from "@/components/animated-number";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { getToken } from "@/lib/api";
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(!!getToken());
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navigation */}
@@ -27,15 +35,26 @@ export default function HomePage() {
             <Link href="/docs" className="hover:text-foreground transition-colors">文档</Link>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="ghost" size="sm">登录</Button>
-            </Link>
-            <Link href="/register">
-              <Button size="sm" className="rounded-full px-4">
-                开始使用
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </Button>
-            </Link>
+            {isLoggedIn ? (
+              <Link href="/dashboard">
+                <Button size="sm" className="rounded-full px-4">
+                  进入 Dashboard
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">登录</Button>
+                </Link>
+                <Link href="/register">
+                  <Button size="sm" className="rounded-full px-4">
+                    开始使用
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
