@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { getToken, removeToken, API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { User, Zap, LogOut, Key, CreditCard, Loader2 } from "lucide-react";
+import { User, Zap, LogOut, Key, CreditCard, Loader2, Eye, EyeOff, Copy, Check } from "lucide-react";
 import Link from "next/link";
 
 interface UserProfile {
@@ -17,6 +17,29 @@ interface UserProfile {
   name: string | null;
   plan: string;
   created_at: string;
+}
+
+interface UsageStats {
+  total_requests: number;
+  total_tokens_before: number;
+  total_tokens_after: number;
+  total_tokens_saved: number;
+  total_cost_saved: number;
+  avg_compression_ratio: number;
+  quota: {
+    daily: { current: number; limit: number; remaining: number };
+    monthly: { current: number; limit: number; remaining: number };
+    plan: string;
+  };
+}
+
+interface ApiKey {
+  id: number;
+  name: string;
+  key_prefix: string;
+  is_active: boolean;
+  created_at: string;
+  last_used_at: string | null;
 }
 
 export default function ProfilePage() {
@@ -28,9 +51,15 @@ export default function ProfilePage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [stats, setStats] = useState<UsageStats | null>(null);
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+  const [newKeyName, setNewKeyName] = useState("");
+  const [showNewKey, setShowNewKey] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [creatingKey, setCreatingKey] = useState(false);
 
   useEffect(() => {
-    async function loadUser() {
+    async function loadData() {
       const token = getToken();
       if (!token) {
         router.push("/login");
@@ -38,28 +67,39 @@ export default function ProfilePage() {
       }
 
       try {
-        const response = await fetch(
-          `${getApiBaseUrl()}/auth/me`,
-          {
+        const [userRes, statsRes, keysRes] = await Promise.all([
+          fetch(`${getApiBaseUrl()}/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+          }),
+          fetch(`${getApiBaseUrl()}/usage/stats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${getApiBaseUrl()}/api-keys`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
 
-        if (response.ok) {
-          const userData = await response.json();
+        if (userRes.ok) {
+          const userData = await userRes.json();
           setUser(userData);
           setName(userData.name || "");
-        } else {
-          router.push("/login");
+        }
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          setStats(statsData);
+        }
+        if (keysRes.ok) {
+          const keysData = await keysRes.json();
+          setApiKeys(keysData || []);
         }
       } catch (error) {
-        router.push("/login");
+        console.error("加载失败", error);
       } finally {
         setLoading(false);
       }
     }
 
-    loadUser();
+    loadData();
   }, [router]);
 
   function getApiBaseUrl(): string {
@@ -142,6 +182,54 @@ export default function ProfilePage() {
     }
   }
 
+  async function createApiKey() {
+    const token = getToken();
+    if (!token) return;
+    
+    setCreatingKey(true);
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api-keys`, {
+        method: "POST",
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name: newKeyName || "New Key" })
+      });
+      const data = await response.json();
+      if (data.api_key) {
+        setShowNewKey(data.api_key);
+        setApiKeys([...apiKeys, data]);
+        setNewKeyName("");
+      }
+    } catch (err) {
+      console.error("创建API Key失败", err);
+    } finally {
+      setCreatingKey(false);
+    }
+  }
+
+  async function deleteApiKey(id: number) {
+    const token = getToken();
+    if (!token) return;
+    
+    try {
+      await fetch(`${getApiBaseUrl()}/api-keys/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setApiKeys(apiKeys.filter(k => k.id !== id));
+    } catch (err) {
+      console.error("删除API Key失败", err);
+    }
+  }
+
+  function copyToClipboard(text: string, id: number) {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  }
+
   function handleLogout() {
     removeToken();
     router.push("/login");
@@ -221,6 +309,125 @@ export default function ProfilePage() {
           </div>
         </Card>
 
+        {/* 用量统计 */}
+        {stats && (
+          <Card className="p-6 rounded-2xl border-none shadow-sm bg-white mb-6">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              使用统计
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <div className="text-center p-3 bg-muted rounded-lg">
+                <p className="text-2xl font-bold">{stats.total_requests}</p>
+                <p className="text-xs text-muted-foreground">总请求数</p>
+              </div>
+              <div className="text-center p-3 bg-muted rounded-lg">
+                <p className="text-2xl font-bold">{stats.total_tokens_saved}</p>
+                <p className="text-xs text-muted-foreground">节省Token</p>
+              </div>
+              <div className="text-center p-3 bg-muted rounded-lg">
+                <p className="text-2xl font-bold">${stats.total_cost_saved.toFixed(4)}</p>
+                <p className="text-xs text-muted-foreground">节省费用</p>
+              </div>
+              <div className="text-center p-3 bg-muted rounded-lg">
+                <p className="text-2xl font-bold">{stats.avg_compression_ratio}%</p>
+                <p className="text-xs text-muted-foreground">平均压缩率</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>日用量 ({stats.quota.daily.current}/{stats.quota.daily.limit === -1 ? '∞' : stats.quota.daily.limit})</span>
+                <span>{stats.quota.daily.remaining > 0 ? `${stats.quota.daily.remaining} 剩余` : '已超限'}</span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary rounded-full transition-all" 
+                  style={{width: `${Math.min((stats.quota.daily.current / (stats.quota.daily.limit || 1)) * 100, 100)}%`}}
+                />
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>月用量 ({stats.quota.monthly.current}/{stats.quota.monthly.limit === -1 ? '∞' : stats.quota.monthly.limit})</span>
+                <span>{stats.quota.monthly.remaining > 0 ? `${stats.quota.monthly.remaining} 剩余` : '已超限'}</span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary rounded-full transition-all" 
+                  style={{width: `${Math.min((stats.quota.monthly.current / (stats.quota.monthly.limit || 1)) * 100, 100)}%`}}
+                />
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* API Key 管理 */}
+        <Card className="p-6 rounded-2xl border-none shadow-sm bg-white mb-6">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+            <Key className="w-5 h-5" />
+            API Key 管理
+          </h3>
+          <div className="flex gap-2 mb-4">
+            <Input 
+              placeholder="API Key 名称" 
+              value={newKeyName}
+              onChange={(e) => setNewKeyName(e.target.value)}
+              className="text-sm rounded-xl"
+            />
+            <Button size="sm" onClick={createApiKey} disabled={creatingKey} className="rounded-xl">
+              {creatingKey ? <Loader2 className="w-4 h-4 animate-spin" /> : "创建"}
+            </Button>
+          </div>
+          
+          {showNewKey && (
+            <div className="mb-4 p-4 bg-green-50 rounded-xl border border-green-200">
+              <p className="text-sm text-green-700 mb-2 font-medium">🎉 新 API Key 已创建！请立即复制保存，只显示一次：</p>
+              <div className="flex items-center gap-2 p-2 bg-white rounded-lg">
+                <code className="text-sm break-all flex-1">{showNewKey}</code>
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  onClick={() => copyToClipboard(showNewKey, -1)}
+                >
+                  {copiedId === -1 ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                </Button>
+              </div>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="mt-2" 
+                onClick={() => setShowNewKey(null)}
+              >
+                已保存，关闭
+              </Button>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            {apiKeys.map((key) => (
+              <div key={key.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <div>
+                  <p className="text-sm font-medium">{key.name}</p>
+                  <p className="text-xs text-muted-foreground">{key.key_prefix}...</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    onClick={() => copyToClipboard(key.key_prefix + '...', key.id)}
+                  >
+                    {copiedId === key.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => deleteApiKey(key.id)}>
+                    删除
+                  </Button>
+                </div>
+              </div>
+            ))}
+            {apiKeys.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">暂无 API Key，点击上方创建按钮</p>
+            )}
+          </div>
+        </Card>
+
         {/* 修改密码 */}
         <Card className="p-6 rounded-2xl border-none shadow-sm bg-white mb-6">
           <h3 className="font-semibold mb-4 flex items-center gap-2">
@@ -258,49 +465,11 @@ export default function ProfilePage() {
                 className="rounded-xl mt-1"
               />
             </div>
-            <Button onClick={handleChangePassword} disabled={saving} className="w-full">
-              {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-              修改密码
+            <Button onClick={handleChangePassword} disabled={saving} className="w-full rounded-full">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "修改密码"}
             </Button>
           </div>
         </Card>
-
-        {/* 账号管理 */}
-        <Card className="p-6 rounded-2xl border-none shadow-sm bg-white mb-6">
-          <h3 className="font-semibold mb-4 flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            账号管理
-          </h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/30">
-              <div>
-                <p className="font-medium text-sm">当前套餐</p>
-                <p className="text-xs text-muted-foreground">{planNames[user.plan] || user.plan}</p>
-              </div>
-              <Link href="/pricing">
-                <Button variant="outline" size="sm">升级</Button>
-              </Link>
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/30">
-              <div>
-                <p className="font-medium text-sm">注册时间</p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(user.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* 退出登录 */}
-        <Button
-          variant="destructive"
-          className="w-full rounded-xl"
-          onClick={handleLogout}
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          退出登录
-        </Button>
       </div>
     </div>
   );
