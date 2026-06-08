@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Header
+from fastapi import APIRouter, Depends, HTTPException, status, Header, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -87,21 +87,23 @@ class LoginRequest(BaseModel):
     email: str
     password: str
 
-# 用户登录 - 支持 OAuth2 表单和 JSON 两种方式
+# 用户登录 - 同时支持 JSON (email+password) 和 OAuth2 表单
 @router.post("/auth/login")
-async def login(
-    request: LoginRequest = None,
-    form_data: OAuth2PasswordRequestForm = None,
-    db: Session = Depends(get_db)
-):
-    # 优先尝试 JSON 方式
-    if request:
-        email = request.email
-        password = request.password
-    elif form_data:
-        email = form_data.username
-        password = form_data.password
+async def login(request: Request, db: Session = Depends(get_db)):
+    content_type = request.headers.get("content-type", "")
+    
+    if "application/json" in content_type:
+        # JSON 方式
+        data = await request.json()
+        email = data.get("email")
+        password = data.get("password")
     else:
+        # OAuth2 表单方式
+        form = await request.form()
+        email = form.get("username")
+        password = form.get("password")
+    
+    if not email or not password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="请提供 email 和 password 字段"
