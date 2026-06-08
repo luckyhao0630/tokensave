@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { getToken, removeToken, API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from "react";
-import { Zap, Loader2, LogOut } from "lucide-react";
+import { Zap, Loader2, LogOut, TrendingDown, BarChart3, DollarSign, Key, FileText } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [user, setUser] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
   const [apiKeys, setApiKeys] = useState<any[]>([]);
   const [creatingKey, setCreatingKey] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
@@ -27,22 +28,27 @@ export default function DashboardPage() {
       return;
     }
 
-    // 获取用户信息和API Key列表
+    // 获取用户信息、用量统计、API Key列表
     Promise.all([
       fetch(`${API_BASE_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then(r => r.json()),
+      fetch(`${API_BASE_URL}/usage/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then(r => r.json()),
       fetch(`${API_BASE_URL}/api-keys`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then(r => r.json())
     ])
-      .then(([userData, keysData]) => {
+      .then(([userData, statsData, keysData]) => {
         setUser(userData);
+        setStats(statsData);
         setApiKeys(keysData || []);
         setLoading(false);
       })
-      .catch(() => {
-        setError("加载失败");
+      .catch((err) => {
+        console.error("Dashboard加载失败:", err);
+        setError("加载失败，请刷新重试");
         setLoading(false);
       });
   }, [router]);
@@ -108,6 +114,13 @@ export default function DashboardPage() {
     );
   }
 
+  const planNames: Record<string, string> = {
+    free: "免费版",
+    pro: "专业版",
+    team: "团队版",
+    enterprise: "企业版",
+  };
+
   return (
     <div className="min-h-screen bg-secondary/30">
       <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b">
@@ -119,7 +132,7 @@ export default function DashboardPage() {
             <span className="font-semibold">TokenSaver</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Badge variant="secondary">{user?.plan || "free"}</Badge>
+            <Badge variant="secondary">{planNames[user?.plan] || user?.plan || "免费版"}</Badge>
             <Link href="/profile">
               <Button variant="ghost" size="sm">个人中心</Button>
             </Link>
@@ -133,11 +146,93 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* 统计卡片 */}
+        {stats && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{stats.total_requests || 0}</p>
+                  <p className="text-xs text-muted-foreground">总请求数</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                  <TrendingDown className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{stats.total_tokens_saved || 0}</p>
+                  <p className="text-xs text-muted-foreground">节省Token</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center">
+                  <DollarSign className="w-5 h-5 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">${(stats.total_cost_saved || 0).toFixed(4)}</p>
+                  <p className="text-xs text-muted-foreground">节省费用</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{(stats.avg_compression_ratio || 0).toFixed(1)}%</p>
+                  <p className="text-xs text-muted-foreground">平均压缩率</p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* 配额进度 */}
+        {stats?.quota && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <Card className="p-4">
+              <h3 className="font-semibold mb-3">日用量配额</h3>
+              <div className="flex justify-between text-sm mb-1">
+                <span>{stats.quota.daily.current} / {stats.quota.daily.limit === -1 ? '∞' : stats.quota.daily.limit}</span>
+                <span>{stats.quota.daily.remaining > 0 ? `${stats.quota.daily.remaining} 剩余` : '已用完'}</span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary rounded-full transition-all" 
+                  style={{width: `${Math.min((stats.quota.daily.current / (stats.quota.daily.limit || 1)) * 100, 100)}%`}}
+                />
+              </div>
+            </Card>
+            <Card className="p-4">
+              <h3 className="font-semibold mb-3">月用量配额</h3>
+              <div className="flex justify-between text-sm mb-1">
+                <span>{stats.quota.monthly.current} / {stats.quota.monthly.limit === -1 ? '∞' : stats.quota.monthly.limit}</span>
+                <span>{stats.quota.monthly.remaining > 0 ? `${stats.quota.monthly.remaining} 剩余` : '已用完'}</span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary rounded-full transition-all" 
+                  style={{width: `${Math.min((stats.quota.monthly.current / (stats.quota.monthly.limit || 1)) * 100, 100)}%`}}
+                />
+              </div>
+            </Card>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="p-6">
             <h3 className="font-semibold mb-2">用户信息</h3>
             <p className="text-sm text-muted-foreground">邮箱: {user?.email}</p>
-            <p className="text-sm text-muted-foreground">套餐: {user?.plan}</p>
+            <p className="text-sm text-muted-foreground">套餐: {planNames[user?.plan] || user?.plan || "免费版"}</p>
           </Card>
           
           <Card className="p-6">
