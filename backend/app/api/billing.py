@@ -5,7 +5,7 @@ from typing import Optional, Dict, Any
 
 from app.models.database import get_db, User, Subscription
 from app.api.auth import get_current_user_dependency
-from app.services.payment import PaymentService, STRIPE_PRICE_IDS
+from app.services.paddle import PaddleService, PADDLE_PRICE_IDS
 from app.services.rate_limit import RateLimitService
 
 router = APIRouter(prefix="/api/v1", tags=["billing"])
@@ -61,8 +61,8 @@ async def get_plans():
                 "优先支持",
             ],
             "stripe_price_ids": {
-                "monthly": STRIPE_PRICE_IDS.get("pro_monthly", ""),
-                "yearly": STRIPE_PRICE_IDS.get("pro_yearly", ""),
+                "monthly": PADDLE_PRICE_IDS.get("pro_monthly", ""),
+                "yearly": PADDLE_PRICE_IDS.get("pro_yearly", ""),
             },
         },
         "team": {
@@ -81,9 +81,9 @@ async def get_plans():
                 "高级分析报表",
                 "专属支持",
             ],
-            "stripe_price_ids": {
-                "monthly": STRIPE_PRICE_IDS.get("team_monthly", ""),
-                "yearly": STRIPE_PRICE_IDS.get("team_yearly", ""),
+            "paddle_price_ids": {
+                "monthly": PADDLE_PRICE_IDS.get("team_monthly", ""),
+                "yearly": PADDLE_PRICE_IDS.get("team_yearly", ""),
             },
         },
         "enterprise": {
@@ -102,9 +102,9 @@ async def get_plans():
                 "专属客户经理",
                 "定制集成",
             ],
-            "stripe_price_ids": {
-                "monthly": STRIPE_PRICE_IDS.get("enterprise_monthly", ""),
-                "yearly": STRIPE_PRICE_IDS.get("enterprise_yearly", ""),
+            "paddle_price_ids": {
+                "monthly": PADDLE_PRICE_IDS.get("enterprise_monthly", ""),
+                "yearly": PADDLE_PRICE_IDS.get("enterprise_yearly", ""),
             },
         },
     }
@@ -151,46 +151,31 @@ async def create_checkout(
     current_user: User = Depends(get_current_user_dependency),
     db: Session = Depends(get_db)
 ):
-    """创建Stripe结账会话"""
-    # 检查Stripe是否配置
-    if not PaymentService.is_configured():
+    """创建Paddle结账会话"""
+    # 检查Paddle是否配置
+    if not PaddleService.is_configured():
         raise HTTPException(status_code=503, detail="Payment service not configured")
     
     # 获取价格ID
-    price_id = PaymentService.get_price_id(request.plan, request.interval)
+    price_id = PaddleService.get_price_id(request.plan, request.interval)
     if not price_id:
         raise HTTPException(status_code=400, detail=f"Price ID not found for {request.plan}/{request.interval}")
     
-    # 创建或获取Stripe客户
-    if not current_user.oauth_id:  # 假设oauth_id存储stripe_customer_id
-        customer_result = PaymentService.create_customer(
-            email=current_user.email,
-            name=current_user.name
-        )
-        if not customer_result.get("success"):
-            raise HTTPException(status_code=500, detail=customer_result.get("error"))
-        
-        customer_id = customer_result["customer_id"]
-        # 更新用户记录
-        current_user.oauth_id = customer_id
-        db.commit()
-    else:
-        customer_id = current_user.oauth_id
-    
     # 创建结账会话
-    session_result = PaymentService.create_checkout_session(
-        customer_id=customer_id,
+    session_result = PaddleService.create_transaction_checkout(
+        email=current_user.email,
         price_id=price_id,
         success_url=request.success_url,
         cancel_url=request.cancel_url,
+        custom_data={"user_id": str(current_user.id), "plan": request.plan},
     )
     
     if not session_result.get("success"):
         raise HTTPException(status_code=500, detail=session_result.get("error"))
     
     return {
-        "checkout_url": session_result["url"],
-        "session_id": session_result["session_id"],
+        "checkout_url": session_result.get("url") or session_result.get("checkout_url"),
+        "checkout_id": session_result.get("transaction_id") or session_result.get("checkout_id"),
     }
 
 
@@ -199,40 +184,49 @@ async def create_billing_portal(
     current_user: User = Depends(get_current_user_dependency),
     db: Session = Depends(get_db)
 ):
-    """创建账单管理入口"""
-    if not PaymentService.is_configured():
+    """创建Paddle账单管理入口"""
+    if not PaddleService.is_configured():
         raise HTTPException(status_code=503, detail="Payment service not configured")
     
-    if not current_user.oauth_id:
-        raise HTTPException(status_code=400, detail="No Stripe customer found")
-    
-    result = PaymentService.create_billing_portal_session(current_user.oauth_id)
-    if not result.get("success"):
-        raise HTTPException(status_code=500, detail=result.get("error"))
-    
-    return {"portal_url": result["url"]}
+    # Paddle使用checkout_url作为portal入口
+    # 或者重定向到Paddle的客户中心
+    return {
+        "portal_url": "https://tokesave.com/dashboard",
+        "message": "请通过Dashboard管理您的订阅"
+    }
 
 
 @router.post("/billing/webhook")
-async def stripe_webhook(
+async def paddle_webhook(
     request: Request,
-    stripe_signature: Optional[str] = Header(None, alias="Stripe-Signature")
+    paddle_signature: Optional[str] = Header(None, alias="Paddle-Signature")
 ):
-    """Stripe webhook回调"""
-    if not PaymentService.is_configured():
+    """Paddle webhook回调"""
+    if not PaddleService.is_configured():
         raise HTTPException(status_code=503, detail="Payment service not configured")
     
     payload = await request.body()
     
-    result = PaymentService.handle_webhook(payload, stripe_signature or "")
+    result = PaddleService.handle_webhook(payload, paddle_signature or "")
     
     if not result.get("success"):
         raise HTTPException(status_code=400, detail=result.get("error"))
     
-    # 这里可以添加数据库更新逻辑
-    # 例如：根据event_type更新用户套餐
+    # 处理事件：更新用户套餐
+    event_type = result.get("event_type", "")
+    data = result.get("data", {})
     
-    return {"received": True, "event": result.get("event_type")}
+    # 获取自定义数据中的用户ID
+    custom_data = data.get("custom_data", {})
+    user_id = custom_data.get("user_id")
+    plan = custom_data.get("plan")
+    
+    if user_id and plan and event_type in ["subscription.created", "transaction.completed"]:
+        # 更新用户套餐
+        # 这里需要调用数据库更新逻辑
+        pass
+    
+    return {"received": True, "event": event_type}
 
 
 @router.post("/billing/cancel")
@@ -250,8 +244,8 @@ async def cancel_subscription(
     if not subscription:
         raise HTTPException(status_code=404, detail="No active subscription found")
     
-    if subscription.stripe_subscription_id and PaymentService.is_configured():
-        result = PaymentService.cancel_subscription(subscription.stripe_subscription_id)
+    if subscription.stripe_subscription_id and PaddleService.is_configured():
+        result = PaddleService.cancel_subscription(subscription.stripe_subscription_id)
         if not result.get("success"):
             raise HTTPException(status_code=500, detail=result.get("error"))
     
