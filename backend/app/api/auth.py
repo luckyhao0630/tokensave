@@ -134,8 +134,21 @@ async def login(request: Request, db: Session = Depends(get_db)):
 
 # 刷新Token
 @router.post("/auth/refresh")
-async def refresh_token(refresh_token: str, db: Session = Depends(get_db)):
-    payload = verify_token(refresh_token, token_type="refresh")
+async def refresh_token(request: Request, db: Session = Depends(get_db)):
+    content_type = request.headers.get("content-type", "")
+    if "application/json" in content_type:
+        data = await request.json()
+        refresh_token_value = data.get("refresh_token")
+    else:
+        refresh_token_value = request.query_params.get("refresh_token")
+    
+    if not refresh_token_value:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="请提供 refresh_token"
+        )
+    
+    payload = verify_token(refresh_token_value, token_type="refresh")
     if payload is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
