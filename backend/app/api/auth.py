@@ -174,7 +174,7 @@ async def get_me(current_user: User = Depends(get_current_user_dependency)):
 # API Key管理
 @router.get("/api-keys", response_model=List[ApiKeyResponse])
 async def list_api_keys(current_user: User = Depends(get_current_user_dependency), db: Session = Depends(get_db)):
-    api_keys = db.query(ApiKey).filter(ApiKey.user_id == current_user.id).all()
+    api_keys = db.query(ApiKey).filter(ApiKey.user_id == current_user.id, ApiKey.is_active == True).all()
     return api_keys
 
 @router.post("/api-keys", response_model=ApiKeyCreateResponse)
