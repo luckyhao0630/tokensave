@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { getToken, removeToken, API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { User, Zap, LogOut, Key, CreditCard, Loader2, Eye, EyeOff, Copy, Check } from "lucide-react";
+import { User, Zap, LogOut, Key, CreditCard, Loader2, Eye, EyeOff, Copy, Check, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
 interface UserProfile {
@@ -57,6 +57,7 @@ export default function ProfilePage() {
   const [showNewKey, setShowNewKey] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [creatingKey, setCreatingKey] = useState(false);
+  const [feedbackMessages, setFeedbackMessages] = useState<any[]>([]);
 
   useEffect(() => {
     async function loadData() {
@@ -91,6 +92,15 @@ export default function ProfilePage() {
         if (keysRes.ok) {
           const keysData = await keysRes.json();
           setApiKeys(keysData || []);
+        }
+        
+        // 加载用户反馈
+        const feedbackRes = await fetch(`${getApiBaseUrl()}/contact/messages`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (feedbackRes.ok) {
+          const feedbackData = await feedbackRes.json();
+          setFeedbackMessages(feedbackData || []);
         }
       } catch (error) {
         console.error("加载失败", error);
@@ -424,6 +434,47 @@ export default function ProfilePage() {
             ))}
             {apiKeys.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-4">暂无 API Key，点击上方创建按钮</p>
+            )}
+          </div>
+        </Card>
+
+        {/* 意见反馈 */}
+        <Card className="p-6 rounded-2xl border-none shadow-sm bg-white mb-6">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+            <MessageSquare className="w-5 h-5" />
+            我的反馈
+            <Link href="/contact">
+              <Button size="sm" variant="outline" className="ml-2 rounded-full">提交新反馈</Button>
+            </Link>
+          </h3>
+          <div className="space-y-3">
+            {feedbackMessages.length > 0 ? (
+              feedbackMessages.map((msg) => (
+                <div key={msg.id} className="p-3 bg-muted rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-sm">{msg.subject}</span>
+                      <Badge variant={msg.status === 'replied' ? 'default' : 'secondary'} className="text-xs">
+                        {msg.status === 'replied' ? '已回复' : msg.status === 'new' ? '待处理' : '已关闭'}
+                      </Badge>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {msg.created_at ? new Date(msg.created_at).toLocaleDateString() : ''}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">{msg.message}</p>
+                  {msg.reply && (
+                    <div className="mt-2 p-2 bg-green-50 rounded border border-green-200">
+                      <p className="text-xs text-green-700 font-medium mb-1">管理员回复：</p>
+                      <p className="text-sm text-green-800">{msg.reply}</p>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                暂无反馈记录
+              </p>
             )}
           </div>
         </Card>

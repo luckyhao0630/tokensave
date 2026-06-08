@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/navbar";
 import { useState } from "react";
-import { MessageCircle, Send, CheckCircle, Mail, AlertCircle } from "lucide-react";
+import { MessageCircle, Send, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function ContactPage() {
@@ -146,28 +146,6 @@ export default function ContactPage() {
             </Button>
           </form>
         </Card>
-
-        {/* 邮箱说明 */}
-        <div className="mt-8 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
-            <div>
-              <p className="font-semibold text-yellow-800 mb-1">重要提示</p>
-              <p className="text-sm text-yellow-700">
-                我们尚未配置邮件服务器。如果您需要紧急联系，请直接通过上方表单提交，我们会尽快回复。
-                <br />
-                或添加微信/飞书客服（即将上线）。
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4 text-center text-sm text-muted-foreground">
-          <p className="flex items-center justify-center gap-2">
-            <Mail className="w-4 h-4" />
-            support@tokensave.com（目前仅作展示，请使用上方表单）
-          </p>
-        </div>
       </div>
     </div>
   );
