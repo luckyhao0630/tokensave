@@ -368,7 +368,7 @@ export default function HomePage() {
             {[
               {
                 name: "免费版",
-                price: "¥0",
+                price: "$0",
                 period: "",
                 desc: "适合个人开发者体验",
                 features: ["100 次/天", "基础压缩", "社区支持"],
@@ -377,7 +377,7 @@ export default function HomePage() {
               },
               {
                 name: "专业版",
-                price: "¥49",
+                price: "$19",
                 period: "/月",
                 desc: "适合个人开发者和小团队",
                 features: ["无限次压缩", "高级压缩算法", "API 访问", "邮件支持"],
@@ -386,7 +386,7 @@ export default function HomePage() {
               },
               {
                 name: "团队版",
-                price: "¥199",
+                price: "$99",
                 period: "/月",
                 desc: "适合团队和企业",
                 features: ["5 个成员", "团队管理", "用量统计", "优先支持"],

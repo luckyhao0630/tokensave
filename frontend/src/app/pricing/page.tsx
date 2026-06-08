@@ -167,12 +167,12 @@ export default function PricingPage() {
 
               <div className="mb-6">
                 <span className="text-3xl font-semibold">
-                  ¥{interval === "yearly" ? Math.round(plan.price * 0.8) : plan.price}
+                  ${interval === "yearly" ? Math.round(plan.price * 0.8) : plan.price}
                 </span>
                 <span className="text-muted-foreground">/月</span>
                 {interval === "yearly" && (
                   <p className="text-sm text-green-600 mt-1">
-                    年付 ¥{Math.round(plan.price * 0.8 * 12)}/年
+                    年付 ${Math.round(plan.price * 0.8 * 12)}/年
                   </p>
                 )}
               </div>

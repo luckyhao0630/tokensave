@@ -46,8 +46,8 @@ async def get_plans():
         },
         "pro": {
             "name": "专业版",
-            "price": 49,  # CNY
-            "price_usd": 19,  # USD
+            "price": 19,  # USD
+            "price_usd": 19,
             "daily_limit": -1,
             "monthly_limit": -1,
             "max_tokens_per_request": 50000,
@@ -67,8 +67,8 @@ async def get_plans():
         },
         "team": {
             "name": "团队版",
-            "price": 199,  # CNY
-            "price_usd": 99,  # USD
+            "price": 99,  # USD
+            "price_usd": 99,
             "daily_limit": -1,
             "monthly_limit": -1,
             "max_tokens_per_request": 100000,
@@ -88,8 +88,8 @@ async def get_plans():
         },
         "enterprise": {
             "name": "企业版",
-            "price": 999,  # CNY
-            "price_usd": 499,  # USD
+            "price": 499,  # USD 起
+            "price_usd": 499,
             "daily_limit": -1,
             "monthly_limit": -1,
             "max_tokens_per_request": 500000,
