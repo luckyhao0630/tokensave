@@ -1,15 +1,39 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Zap, Mail } from "lucide-react";
+import { Zap, Mail, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { authApi } from "@/lib/api";
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await authApi.register(email, password);
+      router.push("/login");
+    } catch (err: any) {
+      setError(err.message || "注册失败");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Nav */}
       <nav className="border-b border-border/50">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
@@ -34,7 +58,6 @@ export default function RegisterPage() {
             <Button variant="outline" className="w-full rounded-full h-11">
               使用 GitHub 注册
             </Button>
-
             <Button variant="outline" className="w-full rounded-full h-11">
               <Mail className="w-4 h-4 mr-2" />
               使用 Google 注册
@@ -47,7 +70,13 @@ export default function RegisterPage() {
             <div className="flex-1 h-px bg-border" />
           </div>
 
-          <form className="space-y-4">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="email">邮箱</Label>
               <Input
@@ -55,6 +84,9 @@ export default function RegisterPage() {
                 type="email"
                 placeholder="you@example.com"
                 className="rounded-xl h-11"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
 
@@ -65,6 +97,9 @@ export default function RegisterPage() {
                 type="password"
                 placeholder="至少 8 位字符"
                 className="rounded-xl h-11"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
 
@@ -78,8 +113,8 @@ export default function RegisterPage() {
               </label>
             </div>
 
-            <Button className="w-full rounded-full h-11">
-              创建账户
+            <Button className="w-full rounded-full h-11" disabled={loading}>
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "创建账户"}
             </Button>
           </form>
 
