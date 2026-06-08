@@ -108,8 +108,10 @@ export default function RegisterPage() {
               <label htmlFor="terms" className="text-sm text-muted-foreground leading-tight">
                 我同意{" "}
                 <Link href="/terms" className="text-primary hover:underline">服务条款</Link>
-                {" "}和{" "}
+                {" "}、{" "}
                 <Link href="/privacy" className="text-primary hover:underline">隐私政策</Link>
+                {" "}和{" "}
+                <Link href="/refund" className="text-primary hover:underline">退款政策</Link>
               </label>
             </div>
 
