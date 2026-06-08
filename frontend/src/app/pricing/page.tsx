@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { billingApi, getToken } from "@/lib/api";
 import { useEffect, useState } from "react";
-import { Zap, Check, Loader2, ArrowLeft, Sparkles } from "lucide-react";
+import { Zap, Check, Loader2, ArrowLeft, Sparkles, Clock, PartyPopper } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar";
@@ -20,10 +20,6 @@ interface Plan {
   api_access: boolean;
   team_seats: number;
   features: string[];
-  stripe_price_ids?: {
-    monthly: string;
-    yearly: string;
-  };
 }
 
 interface PlansData {
@@ -38,6 +34,7 @@ export default function PricingPage() {
   const [error, setError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [interval, setInterval] = useState<"monthly" | "yearly">("monthly");
+  const [promo, setPromo] = useState<any>(null);
 
   useEffect(() => {
     async function loadPlans() {
@@ -54,12 +51,19 @@ export default function PricingPage() {
       }
     }
     loadPlans();
+    billingApi.getPromoStatus().then(setPromo).catch(() => {});
   }, []);
 
   async function handleCheckout(plan: string) {
     const token = getToken();
     if (!token) {
       router.push("/login");
+      return;
+    }
+
+    // 限时免费期间，直接跳转到Dashboard
+    if (promo?.enabled) {
+      router.push("/dashboard");
       return;
     }
 
@@ -107,12 +111,10 @@ export default function PricingPage() {
         {/* 限时免费活动横幅 */}
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-full shadow-lg">
-            <Sparkles className="w-5 h-5" />
+            <PartyPopper className="w-5 h-5" />
             <span className="font-semibold">🎉 限时免费活动</span>
-            <span className="text-sm opacity-90">所有功能免费体验，名额有限！</span>
-            <Link href="/register">
-              <Button size="sm" variant="secondary" className="ml-2 rounded-full">立即参与</Button>
-            </Link>
+            <span className="text-sm opacity-90">所有功能免费体验至 2026-07-08</span>
+            <Clock className="w-4 h-4" />
           </div>
         </div>
 
@@ -178,10 +180,23 @@ export default function PricingPage() {
               </div>
 
               <div className="mb-6">
-                <span className="text-3xl font-semibold">
-                  ${interval === "yearly" ? Math.round(plan.price * 0.8) : plan.price}
-                </span>
-                <span className="text-muted-foreground">/月</span>
+                {/* 原价（淡色删除线） */}
+                <div className="flex items-center gap-2">
+                  <span className="text-3xl font-semibold">
+                    ${interval === "yearly" ? Math.round(plan.price * 0.8) : plan.price}
+                  </span>
+                  <span className="text-muted-foreground">/月</span>
+                </div>
+                {/* 限时免费提示 */}
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-sm text-muted-foreground line-through opacity-50">
+                    ${interval === "yearly" ? Math.round(plan.price * 0.8) : plan.price}/月
+                  </span>
+                  <Badge variant="destructive" className="text-xs">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    限时免费
+                  </Badge>
+                </div>
                 {interval === "yearly" && (
                   <p className="text-sm text-green-600 mt-1">
                     年付 ${Math.round(plan.price * 0.8 * 12)}/年
@@ -201,7 +216,7 @@ export default function PricingPage() {
               <Button
                 className="w-full rounded-full"
                 variant={key === "pro" ? "default" : "outline"}
-                disabled={checkoutLoading === key || key === "enterprise"}
+                disabled={checkoutLoading === key}
                 onClick={() => handleCheckout(key)}
               >
                 {checkoutLoading === key && (
@@ -210,13 +225,13 @@ export default function PricingPage() {
                 {key === "free"
                   ? "免费使用"
                   : key === "enterprise"
-                  ? "联系销售"
+                  ? "🎉 免费体验"
                   : "🎉 免费体验"}
               </Button>
 
               {key === "pro" && (
                 <p className="text-xs text-center text-muted-foreground mt-3">
-                  7天免费试用，随时取消
+                  限时免费体验，随时取消
                 </p>
               )}
             </Card>
