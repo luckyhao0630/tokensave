@@ -183,17 +183,17 @@ export default function PricingPage() {
               </div>
 
               <div className="mb-6">
-                {/* 原价（淡色删除线） */}
+                
                 <div className="flex items-center gap-2">
                   <span className="text-3xl font-semibold">
                     ${interval === "yearly" ? Math.round(plan.price * 0.8) : plan.price}
                   </span>
-                  <span className="text-muted-foreground">/月</span>
+                  <span className="text-muted-foreground">{t("pricing.monthly")}</span>
                 </div>
-                {/* 限时免费提示 */}
+                
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-sm text-muted-foreground line-through opacity-50">
-                    ${interval === "yearly" ? Math.round(plan.price * 0.8) : plan.price}/月
+                    ${interval === "yearly" ? Math.round(plan.price * 0.8) : plan.price}{t("pricing.monthly")}
                   </span>
                   <Badge variant="destructive" className="text-xs">
                     <Sparkles className="w-3 h-3 mr-1" />
@@ -225,9 +225,7 @@ export default function PricingPage() {
                 {checkoutLoading === key && (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 )}
-                {key === "free"
-                  ? t("pricing.cta_free")
-                  : t("pricing.cta_pro")}
+                {promo?.enabled ? "🎉 " + t("pricing.cta_pro") : (key === "free" ? t("pricing.cta_free") : t("pricing.cta_pro"))}
               </Button>
 
               {key === "pro" && (

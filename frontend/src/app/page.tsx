@@ -123,13 +123,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <Badge variant="secondary" className="mb-4 rounded-full px-4 py-1.5 text-sm font-medium">
-              🎯 新手必看
+              🎯 {t('home.newbie_badge')}
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-              5分钟快速上手
+              {t('home.quick_start_title')}
             </h2>
             <p className="text-lg text-muted-foreground">
-              不需要懂技术，跟着步骤做，轻松省钱
+              {t('home.quick_start_subtitle')}
             </p>
           </div>
 
@@ -137,34 +137,34 @@ export default function HomePage() {
             {[
               {
                 step: "1",
-                title: "注册账号",
-                desc: "点击右上角「开始使用」，用邮箱注册，30秒完成",
+                title: t("home.step1_title"),
+                desc: t("home.step1_desc"),
                 icon: "👤",
-                action: "立即注册",
+                action: t("home.step1_action"),
                 href: "/register",
               },
               {
                 step: "2",
-                title: "创建 API Key",
-                desc: "进入 Dashboard，点击「创建新密钥」，复制生成的 Key",
+                title: t("home.step2_title"),
+                desc: t("home.step2_desc"),
                 icon: "🔑",
-                action: "查看教程",
+                action: t("home.step2_action"),
                 href: "/docs",
               },
               {
                 step: "3",
-                title: "替换 API 地址",
-                desc: "把代码里的 https://api.openai.com 换成 https://api.tokesave.com/proxy/openai",
+                title: t("home.step3_title"),
+                desc: t("home.step3_desc"),
                 icon: "🔄",
-                action: "查看代码",
+                action: t("home.step3_action"),
                 href: "/docs",
               },
               {
                 step: "4",
-                title: "查看省钱统计",
-                desc: "在 Dashboard 查看每天节省了多少 Token 和费用",
+                title: t("home.step4_title"),
+                desc: t("home.step4_desc"),
                 icon: "📊",
-                action: "进入 Dashboard",
+                action: t("home.step4_action"),
                 href: "/dashboard",
               },
             ].map((item) => (
@@ -191,10 +191,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-              三步接入，立省一半
+              {t('home.features_title')}
             </h2>
             <p className="text-lg text-muted-foreground">
-              无需改动业务逻辑，像使用 CDN 一样简单
+              {t('home.features_subtitle')}
             </p>
           </div>
 
@@ -202,20 +202,20 @@ export default function HomePage() {
             {[
               {
                 icon: Code,
-                title: "SDK 模式",
-                desc: "一行代码替换 LLM Client，自动压缩所有请求",
+                title: t("home.sdk_title"),
+                desc: t("home.sdk_desc"),
                 code: "import { compress } from 'tokensaver'\nconst result = await compress(messages)",
               },
               {
                 icon: Globe,
-                title: "Proxy 模式",
-                desc: "修改 Base URL，零代码改动，所有请求自动压缩",
+                title: t("home.proxy_title"),
+                desc: t("home.proxy_desc"),
                 code: "https://api.openai.com\n↓\nhttps://api.tokesave.com/proxy",
               },
               {
                 icon: Shield,
-                title: "API 模式",
-                desc: "直接调用压缩 API，灵活集成到任何系统",
+                title: t("home.api_title"),
+                desc: t("home.api_desc"),
                 code: "POST /api/v1/compress\n{\n  messages: [...]\n}",
               },
             ].map((feature) => (
@@ -239,19 +239,19 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-              压缩效果一览
+              {t('home.compression_title')}
             </h2>
             <p className="text-lg text-muted-foreground">
-              不同内容类型，都能大幅压缩
+              {t('home.compression_subtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { type: "JSON 数组", ratio: 90, icon: BarChart3 },
-              { type: "日志文件", ratio: 92, icon: Code },
-              { type: "搜索结果", ratio: 88, icon: Zap },
-              { type: "HTML 内容", ratio: 70, icon: Globe },
+              { type: t("home.json_array"), ratio: 90, icon: BarChart3 },
+              { type: t("home.log_file"), ratio: 92, icon: Code },
+              { type: t("home.search_result"), ratio: 88, icon: Zap },
+              { type: t("home.html_content"), ratio: 70, icon: Globe },
             ].map((item) => (
               <Card key={item.type} className="p-6 border-0 shadow-none bg-secondary/50">
                 <div className="flex items-center justify-between mb-4">
@@ -282,10 +282,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-              开发者怎么说
+              {t('home.testimonials_title')}
             </h2>
             <p className="text-lg text-muted-foreground">
-              来自全球开发者的真实反馈
+              {t('home.testimonials_subtitle')}
             </p>
           </div>
 
@@ -293,20 +293,20 @@ export default function HomePage() {
             {[
               {
                 name: "Alex Chen",
-                role: "AI 应用开发者",
-                content: "接入 TokenSaver 后，我们的 AI 客服成本直接降低了 70%。简单的 API 调用，没有任何学习成本。",
+                role: t("home.testimonial1_role"),
+                content: t("home.testimonial1_content"),
                 rating: 5,
               },
               {
                 name: "Sarah Wang",
-                role: "全栈工程师",
-                content: "Proxy 模式太方便了，零代码改动就能节省一半费用。Dashboard 的用量统计也很清晰。",
+                role: t("home.testimonial2_role"),
+                content: t("home.testimonial2_content"),
                 rating: 5,
               },
               {
                 name: "Mike Zhang",
-                role: "创业公司 CTO",
-                content: "对于我们这种大量使用 LLM 的初创公司，TokenSaver 每月帮我们省下几千刀，ROI 极高。",
+                role: t("home.testimonial3_role"),
+                content: t("home.testimonial3_content"),
                 rating: 5,
               },
             ].map((testimonial) => (
@@ -339,40 +339,40 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-              简单定价
+              {t('home.pricing_simple')}
             </h2>
             <p className="text-lg text-muted-foreground">
-              节省的费用远超产品成本
+              {t('home.pricing_desc')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
               {
-                name: "免费版",
+                name: t("home.free_plan_name"),
                 price: "$0",
                 period: "",
-                desc: "适合个人开发者体验",
-                features: ["100 次/天", "基础压缩", "社区支持"],
-                cta: "开始使用",
+                desc: t("home.free_plan_desc"),
+                features: [t("home.free_features")[0], t("home.free_features")[1], t("home.free_features")[2]],
+                cta: promo?.enabled ? "🎉 " + t("pricing.cta_pro") : t("home.cta_start"),
                 highlight: false,
               },
               {
-                name: "专业版",
+                name: t("home.pro_plan_name"),
                 price: "$19",
-                period: "/月",
-                desc: "适合个人开发者和小团队",
-                features: ["无限次压缩", "高级压缩算法", "API 访问", "邮件支持"],
-                cta: "立即升级",
+                period: t("pricing.period"),
+                desc: t("home.pro_plan_desc"),
+                features: [t("home.pro_features")[0], t("home.pro_features")[1], t("home.pro_features")[2], t("home.pro_features")[3]],
+                cta: promo?.enabled ? "🎉 " + t("pricing.cta_pro") : t("home.cta_upgrade"),
                 highlight: true,
               },
               {
-                name: "团队版",
+                name: t("home.team_plan_name"),
                 price: "$99",
-                period: "/月",
-                desc: "适合团队和企业",
-                features: ["5 个成员", "团队管理", "用量统计", "优先支持"],
-                cta: "联系销售",
+                period: t("pricing.period"),
+                desc: t("home.team_plan_desc"),
+                features: [t("home.team_features")[0], t("home.team_features")[1], t("home.team_features")[2], t("home.team_features")[3]],
+                cta: promo?.enabled ? "🎉 " + t("pricing.cta_pro") : t("home.cta_contact"),
                 highlight: false,
               },
             ].map((plan) => (
@@ -424,14 +424,14 @@ export default function HomePage() {
       <section className="py-24 bg-primary">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 text-white">
-            开始节省 LLM 费用
+            {t('home.cta_section_title')}
           </h2>
           <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-            加入 10,000+ 开发者，用 TokenSaver 降低 AI 应用成本
+            {t('home.cta_section_desc')}
           </p>
           <Link href="/register">
             <Button size="lg" className="rounded-full px-8 h-12 text-base bg-white text-primary hover:bg-white/90">
-              免费开始使用
+              {t('home.cta_button')}
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>

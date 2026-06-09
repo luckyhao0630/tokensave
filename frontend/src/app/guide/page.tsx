@@ -157,9 +157,9 @@ async function chatWithAI() {
         {/* Header */}
         <div className="text-center mb-12">
           <BookOpen className="w-12 h-12 text-primary mx-auto mb-4" />
-          <h1 className="text-4xl font-bold mb-4">完整操作手册</h1>
+          <h1 className="text-4xl font-bold mb-4">{t('home.guide_title')}</h1>
           <p className="text-lg text-muted-foreground">
-            从注册到对接，手把手教你使用 TokenSaver
+            {t('home.guide_subtitle')}
           </p>
         </div>
 
@@ -167,7 +167,7 @@ async function chatWithAI() {
         <div className="space-y-8 mb-16">
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Zap className="w-6 h-6 text-primary" />
-            4步接入
+            {t('home.steps_title')}
           </h2>
 
           {steps.map((s) => (
@@ -204,7 +204,7 @@ async function chatWithAI() {
         <div className="mb-16">
           <h2 className="text-2xl font-bold flex items-center gap-2 mb-6">
             <Globe className="w-6 h-6 text-primary" />
-            支持的 AI 服务商
+            {t('home.providers_title')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {providers.map((p) => (
@@ -225,7 +225,7 @@ async function chatWithAI() {
         <div className="mb-16">
           <h2 className="text-2xl font-bold flex items-center gap-2 mb-6">
             <Code className="w-6 h-6 text-primary" />
-            完整代码示例
+            {t('home.examples_title')}
           </h2>
 
           {/* Python */}
@@ -297,26 +297,26 @@ async function chatWithAI() {
 
         {/* FAQ */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold mb-6">常见问题</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('home.faq_title')}</h2>
           <div className="space-y-4">
             <Card className="p-4">
-              <h3 className="font-semibold mb-2">Q: 我需要修改现有代码吗？</h3>
-              <p className="text-muted-foreground">只需要改 2 处：API 地址 + 添加 X-API-Key 请求头。其他代码完全不变。</p>
+              <h3 className="font-semibold mb-2">{t('home.faq_q1')}</h3>
+              <p className="text-muted-foreground">{t('home.faq_a1')}其他代码完全不变。</p>
             </Card>
             <Card className="p-4">
-              <h3 className="font-semibold mb-2">Q: 压缩后会影响 AI 回答质量吗？</h3>
+              <h3 className="font-semibold mb-2">{t('home.faq_q2')}</h3>
               <p className="text-muted-foreground">不会。我们只压缩冗余信息（重复日志、JSON默认值、HTML标签等），保留所有关键内容和语义。</p>
             </Card>
             <Card className="p-4">
-              <h3 className="font-semibold mb-2">Q: 免费版和付费版有什么区别？</h3>
+              <h3 className="font-semibold mb-2">{t('home.faq_q3')}</h3>
               <p className="text-muted-foreground">免费版：100次/天，基础压缩。付费版：无限请求，高级压缩算法（代码/HTML/CSV），API Key 访问。</p>
             </Card>
             <Card className="p-4">
-              <h3 className="font-semibold mb-2">Q: 限时免费活动什么时候结束？</h3>
+              <h3 className="font-semibold mb-2">{t('home.faq_q4')}</h3>
               <p className="text-muted-foreground">2026年7月8日结束。活动期内所有用户免费体验 Pro 版全部功能。</p>
             </Card>
             <Card className="p-4">
-              <h3 className="font-semibold mb-2">Q: 支持哪些编程语言？</h3>
+              <h3 className="font-semibold mb-2">{t('home.faq_q5')}</h3>
               <p className="text-muted-foreground">任何支持 HTTP 请求的语言都可以。提供 Python、Node.js、Go、Rust 示例代码。</p>
             </Card>
           </div>
@@ -324,21 +324,21 @@ async function chatWithAI() {
 
         {/* CTA */}
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">准备好了？</h2>
+          <h2 className="text-2xl font-bold mb-4">{t('home.ready_title')}</h2>
           <p className="text-muted-foreground mb-6">
-            5 分钟完成对接，立即节省 60-95% 的 Token 费用
+            {t('home.ready_desc')}
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/register">
               <Button size="lg" className="rounded-full px-8">
-                免费开始
+                {t('hero.cta_primary')}
                 <ChevronRight className="w-5 h-5 ml-1" />
               </Button>
             </Link>
             <Link href="/docs">
               <Button variant="outline" size="lg" className="rounded-full px-8">
                 <Terminal className="w-5 h-5 mr-2" />
-                API 文档
+                {t('hero.cta_secondary')}
               </Button>
             </Link>
           </div>

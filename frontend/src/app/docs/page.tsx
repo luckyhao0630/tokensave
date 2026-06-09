@@ -44,7 +44,7 @@ response = requests.post(
 )
 
 result = response.json()
-print(f"压缩率: {result['savings_percentage']:.1f}%")
+print(f"{t('docs.ratio')}: {result['savings_percentage']:.1f}%")
 print(f"节省费用: \${result['cost_saved_usd']:.4f}")`;
 
   const jsCode = `const API_KEY = 'your-api-key';
@@ -65,7 +65,7 @@ const response = await fetch('https://api.tokesave.com/api/v1/compress', {
 });
 
 const result = await response.json();
-console.log('压缩率: ' + result.savings_percentage.toFixed(1) + '%');
+console.log('{t('docs.ratio')}: ' + result.savings_percentage.toFixed(1) + '%');
 console.log('节省费用: $' + result.cost_saved_usd.toFixed(4));`;
 
   const curlCode = `curl -X POST https://api.tokesave.com/api/v1/compress \\
@@ -73,7 +73,7 @@ console.log('节省费用: $' + result.cost_saved_usd.toFixed(4));`;
   -H "X-API-Key: your-api-key" \\
   -d '{"messages": [{"role": "user", "content": "test"}]}'`;
 
-  const proxyCode = `# Proxy 模式 - 零代码改动
+  const proxyCode = `# {t('docs.proxy')} - 零代码改动
 # 将 API Base URL 替换为 TokenSaver Proxy
 
 # OpenAI
@@ -100,16 +100,16 @@ https://api.tokesave.com/proxy/anthropic/v1
       title: "快速开始",
       items: [
         { label: "概述", id: "overview" },
-        { label: "安装", id: "install" },
-        { label: "认证", id: "auth" },
+        { label: "{t('docs.install')}", id: "install" },
+        { label: "{t('docs.auth')}", id: "auth" },
       ]
     },
     {
       title: "API 参考",
       items: [
-        { label: "压缩接口", id: "compress-api" },
-        { label: "Proxy 模式", id: "proxy" },
-        { label: "用量统计", id: "usage" },
+        { label: "{t('docs.compress_api')}", id: "compress-api" },
+        { label: "{t('docs.proxy')}", id: "proxy" },
+        { label: "{t('docs.usage')}", id: "usage" },
       ]
     },
     {
@@ -123,8 +123,8 @@ https://api.tokesave.com/proxy/anthropic/v1
     {
       title: "其他",
       items: [
-        { label: "响应格式", id: "response" },
-        { label: "支持模型", id: "models" },
+        { label: "{t('docs.response')}", id: "response" },
+        { label: "{t('docs.models')}", id: "models" },
         { label: "定价", id: "pricing" },
         { label: "快速指南", id: "quickstart" },
       ]
@@ -168,29 +168,29 @@ https://api.tokesave.com/proxy/anthropic/v1
           <div className="lg:col-span-3 space-y-12">
             {/* Overview */}
             <section id="overview">
-              <h1 className="text-3xl font-bold tracking-tight mb-4">API 文档</h1>
+              <h1 className="text-3xl font-bold tracking-tight mb-4">{t('docs.title')}</h1>
               <p className="text-lg text-muted-foreground mb-8">
-                TokenSaver 提供简单的 REST API 和 Proxy 模式，让你可以以最少的改动集成 Token 压缩功能。
+                {t('docs.subtitle')}。
               </p>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <Card className="p-6 border-0 shadow-sm bg-white">
                   <div className="text-2xl font-bold text-primary mb-1">3</div>
-                  <div className="text-sm font-medium">集成模式</div>
+                  <div className="text-sm font-medium">{t('docs.integration')}</div>
                   <div className="text-xs text-muted-foreground mt-1">SDK / Proxy / API</div>
                 </Card>
                 <Card className="p-6 border-0 shadow-sm bg-white">
                   <div className="text-2xl font-bold text-primary mb-1">60-95%</div>
-                  <div className="text-sm font-medium">压缩率</div>
-                  <div className="text-xs text-muted-foreground mt-1">平均节省 Token</div>
+                  <div className="text-sm font-medium">{t('docs.ratio')}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{t('docs.avg_save')}</div>
                 </Card>
               </div>
             </section>
 
             {/* Install */}
             <section id="install" className="mt-12">
-              <h2 className="text-2xl font-bold tracking-tight mb-6">安装</h2>
-              <p className="text-muted-foreground mb-4">使用 pip 安装 Python SDK：</p>
+              <h2 className="text-2xl font-bold tracking-tight mb-6">{t('docs.install')}</h2>
+              <p className="text-muted-foreground mb-4">使用 pip {t('docs.install')} Python SDK：</p>
               <div className="bg-secondary rounded-xl p-4 font-mono text-sm">
                 pip install tokensaver
               </div>
@@ -198,24 +198,24 @@ https://api.tokesave.com/proxy/anthropic/v1
 
             {/* Auth */}
             <section id="auth" className="mt-12">
-              <h2 className="text-2xl font-bold tracking-tight mb-6">认证</h2>
+              <h2 className="text-2xl font-bold tracking-tight mb-6">{t('docs.auth')}</h2>
               <div className="bg-secondary rounded-xl p-4 text-sm space-y-2">
-                <p>1. 注册账号 → <Link href="/login" className="text-primary">立即注册</Link></p>
-                <p>2. 创建 API Key → 在 Dashboard 点击"创建新密钥"</p>
-                <p>3. 在请求头添加 X-API-Key</p>
+                <p>{t('docs.step1')}<Link href="/login" className="text-primary">立即注册</Link></p>
+                <p>{t('docs.step2')}</p>
+                <p>{t('docs.step3')}</p>
               </div>
             </section>
 
             {/* Code Examples */}
             <section id="code-examples" className="mt-12">
-              <h2 className="text-2xl font-bold tracking-tight mb-6">代码示例</h2>
+              <h2 className="text-2xl font-bold tracking-tight mb-6">{t('docs.examples')}</h2>
               
               <Tabs defaultValue="python" className="w-full">
                 <TabsList className="w-full rounded-lg bg-secondary">
                   <TabsTrigger value="python" className="rounded-md text-xs">Python</TabsTrigger>
                   <TabsTrigger value="javascript" className="rounded-md text-xs">JavaScript</TabsTrigger>
                   <TabsTrigger value="curl" className="rounded-md text-xs">cURL</TabsTrigger>
-                  <TabsTrigger value="proxy" className="rounded-md text-xs">Proxy 模式</TabsTrigger>
+                  <TabsTrigger value="proxy" className="rounded-md text-xs">{t('docs.proxy')}</TabsTrigger>
                 </TabsList>
 
                 {Object.entries(codeExamples).map(([key, code]) => (
@@ -244,7 +244,7 @@ https://api.tokesave.com/proxy/anthropic/v1
 
             {/* API Endpoints */}
             <section id="compress-api" className="mt-12">
-              <h2 className="text-2xl font-bold tracking-tight mb-6">压缩接口</h2>
+              <h2 className="text-2xl font-bold tracking-tight mb-6">{t('docs.compress_api')}</h2>
               
               <Card className="p-6 border-0 shadow-sm bg-white">
                 <div className="flex items-center gap-3 mb-4">
@@ -252,7 +252,7 @@ https://api.tokesave.com/proxy/anthropic/v1
                   <code className="text-sm font-mono">/api/v1/compress</code>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
-                  压缩消息数组，返回压缩后的消息和统计信息。
+                  {t('docs.compress_desc')}
                 </p>
                 <div className="text-xs font-mono bg-secondary rounded-lg p-3">
                   {`{
@@ -265,7 +265,7 @@ https://api.tokesave.com/proxy/anthropic/v1
             </section>
 
             <section id="proxy" className="mt-12">
-              <h2 className="text-2xl font-bold tracking-tight mb-6">Proxy 模式</h2>
+              <h2 className="text-2xl font-bold tracking-tight mb-6">{t('docs.proxy')}</h2>
               
               <Card className="p-6 border-0 shadow-sm bg-white">
                 <div className="flex items-center gap-3 mb-4">
@@ -273,7 +273,7 @@ https://api.tokesave.com/proxy/anthropic/v1
                   <code className="text-sm font-mono">/api/v1/proxy/&#123;provider&#125;</code>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Proxy 模式，自动压缩请求并转发到指定 Provider。
+                  {t('docs.proxy')}，自动压缩请求并转发到指定 Provider。
                 </p>
                 <div className="text-xs font-mono bg-secondary rounded-lg p-3">
                   // 支持 provider: openai, anthropic, deepseek
@@ -283,7 +283,7 @@ https://api.tokesave.com/proxy/anthropic/v1
             </section>
 
             <section id="usage" className="mt-12">
-              <h2 className="text-2xl font-bold tracking-tight mb-6">用量统计</h2>
+              <h2 className="text-2xl font-bold tracking-tight mb-6">{t('docs.usage')}</h2>
               
               <div className="space-y-4">
                 <Card className="p-6 border-0 shadow-sm bg-white">
@@ -292,7 +292,7 @@ https://api.tokesave.com/proxy/anthropic/v1
                     <code className="text-sm font-mono">/api/v1/usage/stats</code>
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    获取用户总体用量统计。
+                    获取用户总体{t('docs.usage')}。
                   </p>
                 </Card>
 
@@ -302,10 +302,10 @@ https://api.tokesave.com/proxy/anthropic/v1
                     <code className="text-sm font-mono">/api/v1/usage/daily</code>
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    获取最近 N 天的每日用量统计。
+                    获取最近 N 天的每日{t('docs.usage')}。
                   </p>
                   <div className="text-xs font-mono bg-secondary rounded-lg p-3">
-                    Query: ?days=7 (默认 7 天)
+                    {t('docs.query_param')}
                   </div>
                 </Card>
               </div>
@@ -377,14 +377,14 @@ https://api.tokesave.com/proxy/anthropic/v1
 
             {/* Response Format */}
             <section id="response" className="mt-12">
-              <h2 className="text-2xl font-bold tracking-tight mb-6">响应格式</h2>
+              <h2 className="text-2xl font-bold tracking-tight mb-6">{t('docs.response')}</h2>
               
               <div className="text-xs font-mono bg-secondary rounded-xl p-6">
                 <pre>{`{
   "compressed_messages": [...],  // 压缩后的消息数组
   "tokens_before": 10000,         // 原始 Token 数
   "tokens_after": 2000,           // 压缩后 Token 数
-  "savings_percentage": 80.0,     // 压缩率
+  "savings_percentage": 80.0,     // {t('docs.ratio')}
   "transforms_applied": [         // 应用的压缩策略
     "smart_crusher",
     "cache_aligner"
@@ -396,7 +396,7 @@ https://api.tokesave.com/proxy/anthropic/v1
 
             {/* Supported Models */}
             <section id="models" className="mt-12">
-              <h2 className="text-2xl font-bold tracking-tight mb-6">支持模型</h2>
+              <h2 className="text-2xl font-bold tracking-tight mb-6">{t('docs.models')}</h2>
               
               <div className="grid md:grid-cols-2 gap-4">
                 {[
@@ -421,7 +421,7 @@ https://api.tokesave.com/proxy/anthropic/v1
 
             {/* Pricing */}
             <section id="pricing" className="mt-12">
-              <h2 className="text-2xl font-bold tracking-tight mb-6">套餐定价</h2>
+              <h2 className="text-2xl font-bold tracking-tight mb-6">{t('docs.pricing')}</h2>
               <div className="grid md:grid-cols-4 gap-4">
                 {[
                   { name: "免费版", price: "$0", limit: "100次/天", features: ["基础压缩", "100次/日", "社区支持"] },
@@ -447,7 +447,7 @@ https://api.tokesave.com/proxy/anthropic/v1
 
             {/* Quick Start Guide */}
             <section id="quickstart" className="mt-12 mb-12">
-              <h2 className="text-2xl font-bold tracking-tight mb-6">快速开始指南</h2>
+              <h2 className="text-2xl font-bold tracking-tight mb-6">{t('docs.quickstart')}</h2>
               <div className="space-y-6">
                 {[
                   { step: "1", title: "注册账号", desc: "访问 https://tokesave.com 注册免费账号，1分钟即可完成。" },
@@ -470,7 +470,7 @@ https://api.tokesave.com/proxy/anthropic/v1
               <div className="mt-8 text-center">
                 <Link href="/login">
                   <Button className="rounded-full gap-2">
-                    立即开始使用
+                    {t('hero.cta_primary')}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>

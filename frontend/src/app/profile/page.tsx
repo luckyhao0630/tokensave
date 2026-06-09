@@ -105,7 +105,7 @@ export default function ProfilePage() {
           setFeedbackMessages(feedbackData || []);
         }
       } catch (error) {
-        console.error("加载失败", error);
+        console.error("Load failed", error);
       } finally {
         setLoading(false);
       }
@@ -180,15 +180,15 @@ export default function ProfilePage() {
       });
 
       if (response.ok) {
-        alert("密码修改成功，请重新登录");
+        alert("密码{t('profile.change')}成功，请重新登录");
         removeToken();
         router.push("/login");
       } else {
         const error = await response.json();
-        alert(error.detail || "密码修改失败");
+        alert(error.detail || t("profile.password_change_failed"));
       }
     } catch (error) {
-      alert("密码修改失败");
+      alert("密码{t('profile.change')}失败");
     } finally {
       setSaving(false);
     }
@@ -215,7 +215,7 @@ export default function ProfilePage() {
         setNewKeyName("");
       }
     } catch (err) {
-      console.error("创建API Key失败", err);
+      console.error("Create API Key failed", err);
     } finally {
       setCreatingKey(false);
     }
@@ -232,7 +232,7 @@ export default function ProfilePage() {
       });
       setApiKeys(apiKeys.filter(k => k.id !== id));
     } catch (err) {
-      console.error("删除API Key失败", err);
+      console.error("Delete API Key failed", err);
     }
   }
 
@@ -258,10 +258,10 @@ export default function ProfilePage() {
   if (!user) return null;
 
   const planNames: Record<string, string> = {
-    free: "免费版",
-    pro: "专业版",
-    team: "团队版",
-    enterprise: "企业版",
+    free: t("pricing.free"),
+    pro: t("pricing.pro"),
+    team: t("pricing.team"),
+    enterprise: t("pricing.enterprise"),
   };
 
   return (
@@ -278,16 +278,16 @@ export default function ProfilePage() {
             </Link>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" />
-              退出
+              {t("common.logout")}
             </Button>
           </div>
         </div>
       </nav>
 
       <div className="max-w-3xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-bold mb-8">个人中心</h1>
+        <h1 className="text-2xl font-bold mb-8">{t("profile.title")}</h1>
 
-        {/* 基本信息 */}
+        {/* {t('profile.basic_info')} */}
         <Card className="p-6 rounded-2xl border-none shadow-sm bg-white mb-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -304,17 +304,17 @@ export default function ProfilePage() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="name">显示名称</Label>
+              <Label htmlFor="name">{t('profile.name')}</Label>
               <div className="flex gap-2 mt-1">
                 <Input
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="您的姓名"
+                  placeholder="{t('profile.name_placeholder')}"
                   className="rounded-xl"
                 />
                 <Button onClick={handleUpdateName} disabled={saving}>
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "保存"}
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "{t('profile.save')}"}
                 </Button>
               </div>
             </div>
@@ -326,30 +326,30 @@ export default function ProfilePage() {
           <Card className="p-6 rounded-2xl border-none shadow-sm bg-white mb-6">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <CreditCard className="w-5 h-5" />
-              使用统计
+              {t('profile.usage_stats')}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               <div className="text-center p-3 bg-muted rounded-lg">
                 <p className="text-2xl font-bold">{stats.total_requests}</p>
-                <p className="text-xs text-muted-foreground">总请求数</p>
+                <p className="text-xs text-muted-foreground">{t('dashboard.total_requests')}</p>
               </div>
               <div className="text-center p-3 bg-muted rounded-lg">
                 <p className="text-2xl font-bold">{stats.total_tokens_saved}</p>
-                <p className="text-xs text-muted-foreground">节省Token</p>
+                <p className="text-xs text-muted-foreground">{t('dashboard.tokens_saved')}</p>
               </div>
               <div className="text-center p-3 bg-muted rounded-lg">
                 <p className="text-2xl font-bold">${stats.total_cost_saved.toFixed(4)}</p>
-                <p className="text-xs text-muted-foreground">节省费用</p>
+                <p className="text-xs text-muted-foreground">{t('dashboard.cost_saved')}</p>
               </div>
               <div className="text-center p-3 bg-muted rounded-lg">
                 <p className="text-2xl font-bold">{stats.avg_compression_ratio}%</p>
-                <p className="text-xs text-muted-foreground">平均压缩率</p>
+                <p className="text-xs text-muted-foreground">{t('dashboard.compression_ratio')}</p>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>日用量 ({stats.quota.daily.current}/{stats.quota.daily.limit === -1 ? '∞' : stats.quota.daily.limit})</span>
-                <span>{stats.quota.daily.remaining > 0 ? `${stats.quota.daily.remaining} 剩余` : '已超限'}</span>
+                <span>{t('profile.daily_usage')} ({stats.quota.daily.current}/{stats.quota.daily.limit === -1 ? '∞' : stats.quota.daily.limit})</span>
+                <span>{stats.quota.daily.remaining > 0 ? `${stats.quota.daily.remaining} {t('profile.remaining')}` : '已超限'}</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div 
@@ -358,8 +358,8 @@ export default function ProfilePage() {
                 />
               </div>
               <div className="flex justify-between text-sm">
-                <span>月用量 ({stats.quota.monthly.current}/{stats.quota.monthly.limit === -1 ? '∞' : stats.quota.monthly.limit})</span>
-                <span>{stats.quota.monthly.remaining > 0 ? `${stats.quota.monthly.remaining} 剩余` : '已超限'}</span>
+                <span>{t('profile.monthly_usage')} ({stats.quota.monthly.current}/{stats.quota.monthly.limit === -1 ? '∞' : stats.quota.monthly.limit})</span>
+                <span>{stats.quota.monthly.remaining > 0 ? `${stats.quota.monthly.remaining} {t('profile.remaining')}` : '已超限'}</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div 
@@ -371,27 +371,27 @@ export default function ProfilePage() {
           </Card>
         )}
 
-        {/* API Key 管理 */}
+        {/* {t('dashboard.api_key_mgmt')} */}
         <Card className="p-6 rounded-2xl border-none shadow-sm bg-white mb-6">
           <h3 className="font-semibold mb-4 flex items-center gap-2">
             <Key className="w-5 h-5" />
-            API Key 管理
+            {t('dashboard.api_key_mgmt')}
           </h3>
           <div className="flex gap-2 mb-4">
             <Input 
-              placeholder="API Key 名称" 
+              placeholder="{t('dashboard.api_key_name')}" 
               value={newKeyName}
               onChange={(e) => setNewKeyName(e.target.value)}
               className="text-sm rounded-xl"
             />
             <Button size="sm" onClick={createApiKey} disabled={creatingKey} className="rounded-xl">
-              {creatingKey ? <Loader2 className="w-4 h-4 animate-spin" /> : "创建"}
+              {creatingKey ? <Loader2 className="w-4 h-4 animate-spin" /> : "{t('dashboard.create')}"}
             </Button>
           </div>
           
           {showNewKey && (
             <div className="mb-4 p-4 bg-green-50 rounded-xl border border-green-200">
-              <p className="text-sm text-green-700 mb-2 font-medium">🎉 新 API Key 已创建！请立即复制保存，只显示一次：</p>
+              <p className="text-sm text-green-700 mb-2 font-medium">🎉 新 API Key 已{t('dashboard.create')}！请立即复制{t('profile.save')}，只显示一次：</p>
               <div className="flex items-center gap-2 p-2 bg-white rounded-lg">
                 <code className="text-sm break-all flex-1">{showNewKey}</code>
                 <Button 
@@ -408,7 +408,7 @@ export default function ProfilePage() {
                 className="mt-2" 
                 onClick={() => setShowNewKey(null)}
               >
-                已保存，关闭
+                已{t('profile.save')}，关闭
               </Button>
             </div>
           )}
@@ -429,13 +429,13 @@ export default function ProfilePage() {
                     {copiedId === key.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => deleteApiKey(key.id)}>
-                    删除
+                    {t('dashboard.delete')}
                   </Button>
                 </div>
               </div>
             ))}
             {apiKeys.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">暂无 API Key，点击上方创建按钮</p>
+              <p className="text-sm text-muted-foreground text-center py-4">暂无 API Key，点击上方{t('dashboard.create')}按钮</p>
             )}
           </div>
         </Card>
@@ -444,7 +444,7 @@ export default function ProfilePage() {
         <Card className="p-6 rounded-2xl border-none shadow-sm bg-white mb-6">
           <h3 className="font-semibold mb-4 flex items-center gap-2">
             <MessageSquare className="w-5 h-5" />
-            我的反馈
+            {t('profile.feedback')}
             <Link href="/contact">
               <Button size="sm" variant="outline" className="ml-2 rounded-full">提交新反馈</Button>
             </Link>
@@ -457,7 +457,7 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">{msg.subject}</span>
                       <Badge variant={msg.status === 'replied' ? 'default' : 'secondary'} className="text-xs">
-                        {msg.status === 'replied' ? '已回复' : msg.status === 'new' ? '待处理' : '已关闭'}
+                        {msg.status === 'replied' ? '{t('profile.replied')}' : msg.status === 'new' ? '待处理' : '已关闭'}
                       </Badge>
                     </div>
                     <span className="text-xs text-muted-foreground">
@@ -467,7 +467,7 @@ export default function ProfilePage() {
                   <p className="text-sm text-muted-foreground mb-2">{msg.message}</p>
                   {msg.reply && (
                     <div className="mt-2 p-2 bg-green-50 rounded border border-green-200">
-                      <p className="text-xs text-green-700 font-medium mb-1">管理员回复：</p>
+                      <p className="text-xs text-green-700 font-medium mb-1">{t('profile.admin_reply')}：</p>
                       <p className="text-sm text-green-800">{msg.reply}</p>
                     </div>
                   )}
@@ -475,21 +475,21 @@ export default function ProfilePage() {
               ))
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">
-                暂无反馈记录
+                {t('profile.no_feedback')}
               </p>
             )}
           </div>
         </Card>
 
-        {/* 修改密码 */}
+        {/* {t('profile.change_password')} */}
         <Card className="p-6 rounded-2xl border-none shadow-sm bg-white mb-6">
           <h3 className="font-semibold mb-4 flex items-center gap-2">
             <Key className="w-5 h-5" />
-            修改密码
+            {t('profile.change_password')}
           </h3>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="current">当前密码</Label>
+              <Label htmlFor="current">{t('profile.current_password')}</Label>
               <Input
                 id="current"
                 type="password"
@@ -499,7 +499,7 @@ export default function ProfilePage() {
               />
             </div>
             <div>
-              <Label htmlFor="new">新密码</Label>
+              <Label htmlFor="new">{t('profile.new_password')}</Label>
               <Input
                 id="new"
                 type="password"
@@ -509,7 +509,7 @@ export default function ProfilePage() {
               />
             </div>
             <div>
-              <Label htmlFor="confirm">确认新密码</Label>
+              <Label htmlFor="confirm">确认{t('profile.new_password')}</Label>
               <Input
                 id="confirm"
                 type="password"
@@ -519,7 +519,7 @@ export default function ProfilePage() {
               />
             </div>
             <Button onClick={handleChangePassword} disabled={saving} className="w-full rounded-full">
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "修改密码"}
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "{t('profile.change_password')}"}
             </Button>
           </div>
         </Card>
