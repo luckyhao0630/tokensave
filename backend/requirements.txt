@@ -11,3 +11,14 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 stripe==11.0.0
 python-dotenv==1.0.0
+
+# MediaKit tools
+openai-whisper
+torch>=2.0.0
+torchaudio>=2.0.0
+pillow>=10.0.0
+rembg>=2.0.50
+yt-dlp>=2023.12.0
+ffmpeg-python>=0.2.0
+numpy>=1.24.0
+

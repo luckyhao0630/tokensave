@@ -18,7 +18,7 @@ app.add_middleware(
 )
 
 # 导入路由
-from app.api import auth, compression, billing, proxy, admin, oauth, contact
+from app.api import auth, compression, billing, proxy, admin, oauth, contact, tools
 
 app.include_router(auth.router)
 app.include_router(compression.router)
@@ -27,18 +27,19 @@ app.include_router(proxy.router)
 app.include_router(admin.router)
 app.include_router(oauth.router)
 app.include_router(contact.router)
+app.include_router(tools.router)
 
 @app.get("/api/v1")
 async def root_api():
-    return {"message": "TokenSaver API", "version": "1.0.0", "docs": "/docs"}
+    return {"message": "MediaKit API", "version": "2.0.0", "docs": "/docs"}
 
 @app.get("/api/v1/")
 async def root_api_slash():
-    return {"message": "TokenSaver API", "version": "1.0.0", "docs": "/docs"}
+    return {"message": "MediaKit API", "version": "2.0.0", "docs": "/docs"}
 
 @app.get("/")
 async def root():
-    return {"message": "TokenSaver API", "version": "1.0.0", "docs": "/docs"}
+    return {"message": "MediaKit API", "version": "2.0.0", "docs": "/docs"}
 
 @app.get("/health")
 async def health_check():
