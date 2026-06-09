@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { removeToken, API_BASE_URL } from "@/lib/api";
+import { useTranslation } from "react-i18next";
 
 interface DashboardData {
   total_users: number;
@@ -42,6 +43,7 @@ interface DashboardData {
 }
 
 export default function AdminPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);

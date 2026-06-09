@@ -10,9 +10,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authApi } from "@/lib/api";
+import { useTranslation } from "react-i18next";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,7 +28,7 @@ export default function RegisterPage() {
       await authApi.register(email, password);
       router.push("/login");
     } catch (err: any) {
-      setError(err.message || "注册失败");
+      setError(err.message || t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -48,25 +50,25 @@ export default function RegisterPage() {
       <div className="flex-1 flex items-center justify-center p-6">
         <Card className="w-full max-w-md p-8 border-0 shadow-sm bg-white">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold tracking-tight mb-2">创建账户</h1>
+            <h1 className="text-2xl font-bold tracking-tight mb-2">{t("register.title")}</h1>
             <p className="text-sm text-muted-foreground">
-              开始免费使用 TokenSaver，节省 LLM 费用
+              {t("register.subtitle")}
             </p>
           </div>
 
           <div className="space-y-4">
             <Button variant="outline" className="w-full rounded-full h-11 opacity-50 cursor-not-allowed" disabled>
-              使用 GitHub 注册 (即将上线)
+              {t("register.github_signup")}
             </Button>
             <Button variant="outline" className="w-full rounded-full h-11 opacity-50 cursor-not-allowed" disabled>
               <Mail className="w-4 h-4 mr-2" />
-              使用 Google 注册 (即将上线)
+              {t("register.google_signup")}
             </Button>
           </div>
 
           <div className="flex items-center gap-4 my-6">
             <div className="flex-1 h-px bg-border" />
-            <span className="text-xs text-muted-foreground">或使用邮箱</span>
+            <span className="text-xs text-muted-foreground">{t("register.or_email")}</span>
             <div className="flex-1 h-px bg-border" />
           </div>
 
@@ -78,7 +80,7 @@ export default function RegisterPage() {
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
-              <Label htmlFor="email">邮箱</Label>
+              <Label htmlFor="email">{t("login.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -91,11 +93,11 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">密码</Label>
+              <Label htmlFor="password">{t("login.password")}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="至少 8 位字符"
+                placeholder={t("login.password_placeholder")}
                 className="rounded-xl h-11"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -106,24 +108,24 @@ export default function RegisterPage() {
             <div className="flex items-start gap-2">
               <Checkbox id="terms" />
               <label htmlFor="terms" className="text-sm text-muted-foreground leading-tight">
-                我同意{" "}
-                <Link href="/terms" className="text-primary hover:underline">服务条款</Link>
+                {t("register.agree")}{" "}
+                <Link href="/terms" className="text-primary hover:underline">{t("footer.terms")}</Link>
                 {" "}、{" "}
-                <Link href="/privacy" className="text-primary hover:underline">隐私政策</Link>
-                {" "}和{" "}
-                <Link href="/refund" className="text-primary hover:underline">退款政策</Link>
+                <Link href="/privacy" className="text-primary hover:underline">{t("footer.privacy")}</Link>
+                {" "}{t("register.and")}{" "}
+                <Link href="/refund" className="text-primary hover:underline">{t("footer.refund")}</Link>
               </label>
             </div>
 
             <Button className="w-full rounded-full h-11" disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "创建账户"}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : t("register.submit")}
             </Button>
           </form>
 
           <p className="text-center text-sm text-muted-foreground mt-6">
-            已有账户？{" "}
+            {t("login.has_account")}{" "}
             <Link href="/login" className="text-primary hover:underline font-medium">
-              立即登录
+              {t("login.go_login")}
             </Link>
           </p>
         </Card>

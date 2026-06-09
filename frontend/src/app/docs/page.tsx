@@ -7,8 +7,10 @@ import { Zap, Copy, CheckCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Navbar from "@/components/navbar";
+import { useTranslation } from "react-i18next";
 
 export default function DocsPage() {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState("overview");
 

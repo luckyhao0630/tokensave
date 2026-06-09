@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { getToken, removeToken, API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { User, Zap, LogOut, Key, CreditCard, Loader2, Eye, EyeOff, Copy, Check, MessageSquare } from "lucide-react";
 import Link from "next/link";
@@ -44,6 +45,7 @@ interface ApiKey {
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

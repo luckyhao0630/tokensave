@@ -9,9 +9,11 @@ import { useState } from "react";
 import { Zap, Loader2, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -41,7 +43,7 @@ export default function LoginPage() {
         router.push("/dashboard");
       }
     } catch (err: any) {
-      setError(err.message || "操作失败");
+      setError(err.message || t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -62,12 +64,12 @@ export default function LoginPage() {
 
         <Card className="p-8 rounded-2xl border-none shadow-lg bg-white">
           <h1 className="text-2xl font-semibold text-center mb-2">
-            {isLogin ? "登录" : "注册"}
+            {isLogin ? t("login.title") : t("register.title")}
           </h1>
           <p className="text-sm text-muted-foreground text-center mb-6">
             {isLogin
-              ? "欢迎回来，请登录您的账户"
-              : "创建账户，开始节省 Token 费用"}
+              ? t("login.subtitle")
+              : t("register.subtitle")}
           </p>
 
           {error && (
@@ -79,11 +81,11 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="name">姓名</Label>
+                <Label htmlFor="name">{t("login.name")}</Label>
                 <Input
                   id="name"
                   type="text"
-                  placeholder="您的姓名"
+                  placeholder={t("login.name_placeholder")}
                   value={form.name}
                   onChange={(e) =>
                     setForm({ ...form, name: e.target.value })
@@ -94,7 +96,7 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">邮箱</Label>
+              <Label htmlFor="email">{t("login.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -109,12 +111,12 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">密码</Label>
+              <Label htmlFor="password">{t("login.password")}</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="至少8位字符"
+                  placeholder={t("login.password_placeholder")}
                   value={form.password}
                   onChange={(e) =>
                     setForm({ ...form, password: e.target.value })
@@ -144,13 +146,13 @@ export default function LoginPage() {
               {loading && (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               )}
-              {isLogin ? "登录" : "注册"}
+              {isLogin ? t("login.submit") : t("register.submit")}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <span className="text-sm text-muted-foreground">
-              {isLogin ? "还没有账户？" : "已有账户？"}
+              {isLogin ? t("login.no_account") : t("login.has_account")}
             </span>{" "}
             <button
               type="button"
@@ -160,13 +162,13 @@ export default function LoginPage() {
               }}
               className="text-sm text-primary hover:underline"
             >
-              {isLogin ? "立即注册" : "去登录"}
+              {isLogin ? t("login.go_register") : t("login.go_login")}
             </button>
           </div>
         </Card>
 
         <p className="text-xs text-muted-foreground text-center mt-6">
-          登录即表示您同意我们的服务条款和隐私政策
+          {t("login.agree_terms")}
         </p>
       </div>
     </div>

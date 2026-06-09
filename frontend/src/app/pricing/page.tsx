@@ -9,6 +9,7 @@ import { Zap, Check, Loader2, ArrowLeft, Sparkles, Clock, PartyPopper } from "lu
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar";
+import { useTranslation } from "react-i18next";
 
 interface Plan {
   name: string;
@@ -29,6 +30,7 @@ interface PlansData {
 
 export default function PricingPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [plans, setPlans] = useState<PlansData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,14 +47,14 @@ export default function PricingPage() {
         setPlans(data);
       } catch (err: any) {
         console.error("[Pricing] Failed to load plans:", err);
-        setError(err.message || "加载失败");
+        setError(err.message || t("common.error"));
       } finally {
         setLoading(false);
       }
     }
     loadPlans();
     billingApi.getPromoStatus().then(setPromo).catch(() => {});
-  }, []);
+  }, [t]);
 
   async function handleCheckout(plan: string) {
     const token = getToken();
@@ -74,7 +76,7 @@ export default function PricingPage() {
         window.location.href = result.checkout_url;
       }
     } catch (err: any) {
-      alert(err.message || "创建支付失败");
+      alert(err.message || t("pricing.checkout_error"));
     } finally {
       setCheckoutLoading(null);
     }
@@ -94,7 +96,7 @@ export default function PricingPage() {
         <div className="text-center">
           <p className="text-red-500 mb-4">{error}</p>
           <button onClick={() => window.location.reload()} className="text-primary hover:underline">
-            刷新重试
+            {t("common.retry")}
           </button>
         </div>
       </div>
@@ -102,6 +104,13 @@ export default function PricingPage() {
   }
 
   const planList = plans?.plans || {};
+
+  const planDescKeys: Record<string, string> = {
+    free: t("pricing.free_desc"),
+    pro: t("pricing.pro_desc"),
+    team: t("pricing.team_desc"),
+    enterprise: t("pricing.enterprise_desc"),
+  };
 
   return (
     <div className="min-h-screen bg-secondary/30">
@@ -112,8 +121,8 @@ export default function PricingPage() {
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-full shadow-lg">
             <PartyPopper className="w-5 h-5" />
-            <span className="font-semibold">🎉 限时免费活动</span>
-            <span className="text-sm opacity-90">所有功能免费体验至 2026-07-08</span>
+            <span className="font-semibold">🎉 {t("promo.title")}</span>
+            <span className="text-sm opacity-90">{t("promo.message")}</span>
             <Clock className="w-4 h-4" />
           </div>
         </div>
@@ -121,10 +130,10 @@ export default function PricingPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-semibold tracking-tight mb-4">
-            选择适合您的方案
+            {t("pricing.title")}
           </h1>
           <p className="text-lg text-muted-foreground">
-            从个人开发者到企业团队，我们为每个阶段提供支持
+            {t("pricing.subtitle")}
           </p>
 
           {/* Interval Toggle */}
@@ -137,7 +146,7 @@ export default function PricingPage() {
                   : "bg-white text-muted-foreground"
               }`}
             >
-              月付
+              {t("pricing.monthly")}
             </button>
             <button
               onClick={() => setInterval("yearly")}
@@ -147,9 +156,9 @@ export default function PricingPage() {
                   : "bg-white text-muted-foreground"
               }`}
             >
-              年付
+              {t("pricing.yearly")}
               <Badge variant="secondary" className="ml-2 text-xs">
-                省20%
+                {t("pricing.save")}
               </Badge>
             </button>
           </div>
@@ -169,13 +178,7 @@ export default function PricingPage() {
               <div className="mb-6">
                 <h3 className="text-lg font-semibold">{plan.name}</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {key === "free"
-                    ? "个人开发者试用"
-                    : key === "pro"
-                    ? "个人开发者"
-                    : key === "team"
-                    ? "小团队"
-                    : "企业"}
+                  {planDescKeys[key] || ""}
                 </p>
               </div>
 
@@ -194,12 +197,12 @@ export default function PricingPage() {
                   </span>
                   <Badge variant="destructive" className="text-xs">
                     <Sparkles className="w-3 h-3 mr-1" />
-                    限时免费
+                    {t("pricing.limited_free")}
                   </Badge>
                 </div>
                 {interval === "yearly" && (
                   <p className="text-sm text-green-600 mt-1">
-                    年付 ${Math.round(plan.price * 0.8 * 12)}/年
+                    {t("pricing.yearly_price", { price: Math.round(plan.price * 0.8 * 12) })}
                   </p>
                 )}
               </div>
@@ -223,15 +226,13 @@ export default function PricingPage() {
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 )}
                 {key === "free"
-                  ? "免费使用"
-                  : key === "enterprise"
-                  ? "🎉 免费体验"
-                  : "🎉 免费体验"}
+                  ? t("pricing.cta_free")
+                  : t("pricing.cta_pro")}
               </Button>
 
               {key === "pro" && (
                 <p className="text-xs text-center text-muted-foreground mt-3">
-                  限时免费体验，随时取消
+                  {t("pricing.trial")}
                 </p>
               )}
             </Card>

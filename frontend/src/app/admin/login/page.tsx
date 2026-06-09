@@ -9,8 +9,10 @@ import { useState } from "react";
 import { Zap, Loader2, Eye, EyeOff, Shield } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 export default function AdminLoginPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -66,12 +68,12 @@ export default function AdminLoginPage() {
 
         <Card className="p-8 rounded-2xl border-none shadow-lg bg-white">
           <h1 className="text-2xl font-semibold text-center mb-2">
-            🔐 后台登录
+            {t("admin_login.title")}
           </h1>
           <p className="text-sm text-muted-foreground text-center mb-6">
-            管理员专用入口，普通用户请访问
+            {t("admin_login.subtitle")}
             <Link href="/login" className="text-primary hover:underline ml-1">
-              前台登录
+              {t("admin_login.user_login")}
             </Link>
           </p>
 
@@ -83,7 +85,7 @@ export default function AdminLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">管理员邮箱</Label>
+              <Label htmlFor="email">{t("admin_login.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -96,12 +98,12 @@ export default function AdminLoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">密码</Label>
+              <Label htmlFor="password">{t("admin_login.password")}</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="输入密码"
+                  placeholder={t("admin_login.password_placeholder")}
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   required
@@ -119,22 +121,22 @@ export default function AdminLoginPage() {
 
             <Button type="submit" className="w-full rounded-full" disabled={loading}>
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              🔐 后台登录
+              {t("admin_login.submit")}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <span className="text-sm text-muted-foreground">
-              不是管理员？
+              {t("admin_login.not_admin")}
             </span>
             <Link href="/login" className="text-sm text-primary hover:underline ml-1">
-              前台登录
+              {t("admin_login.user_login")}
             </Link>
           </div>
         </Card>
 
         <p className="text-xs text-white/40 text-center mt-6">
-          TokenSaver 管理后台 · 仅限授权管理员访问
+          {t("admin_login.footer")}
         </p>
       </div>
     </div>

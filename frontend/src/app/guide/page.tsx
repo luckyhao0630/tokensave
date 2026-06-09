@@ -7,8 +7,10 @@ import Navbar from "@/components/navbar";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Copy, ChevronRight, BookOpen, Code, Zap, Terminal, Globe } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 export default function GuidePage() {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState<string | null>(null);
 
   const copy = (text: string, key: string) => {

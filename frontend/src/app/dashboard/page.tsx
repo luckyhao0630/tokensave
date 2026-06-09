@@ -6,12 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { getToken, removeToken, API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Zap, Loader2, LogOut, TrendingDown, BarChart3, DollarSign, Key, FileText, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [user, setUser] = useState<any>(null);
@@ -48,10 +51,10 @@ export default function DashboardPage() {
       })
       .catch((err) => {
         console.error("Dashboard加载失败:", err);
-        setError("加载失败，请刷新重试");
+        setError(t("common.retry"));
         setLoading(false);
       });
-  }, [router]);
+  }, [router, t]);
 
   async function createApiKey() {
     const token = getToken();
@@ -65,7 +68,7 @@ export default function DashboardPage() {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ name: newKeyName || "New Key" })
+        body: JSON.stringify({ name: newKeyName || t("dashboard.new_key_name") })
       });
       const data = await response.json();
       if (data.api_key) {
@@ -108,17 +111,17 @@ export default function DashboardPage() {
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
         <p className="text-red-500">{error}</p>
         <Link href="/login">
-          <Button>去登录</Button>
+          <Button>{t("login.submit")}</Button>
         </Link>
       </div>
     );
   }
 
   const planNames: Record<string, string> = {
-    free: "免费版",
-    pro: "专业版",
-    team: "团队版",
-    enterprise: "企业版",
+    free: t("pricing.free"),
+    pro: t("pricing.pro"),
+    team: t("pricing.team"),
+    enterprise: t("pricing.enterprise"),
   };
 
   return (
@@ -132,12 +135,12 @@ export default function DashboardPage() {
             <span className="font-semibold">TokenSaver</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Badge variant="secondary">{planNames[user?.plan] || user?.plan || "免费版"}</Badge>
+            <Badge variant="secondary">{planNames[user?.plan] || user?.plan || t("pricing.free")}</Badge>
             <Link href="/profile">
-              <Button variant="ghost" size="sm">个人中心</Button>
+              <Button variant="ghost" size="sm">{t("profile.title")}</Button>
             </Link>
             <Button variant="ghost" size="sm" onClick={() => { removeToken(); router.push("/login"); }}>
-              <LogOut className="w-4 h-4 mr-1" />退出
+              <LogOut className="w-4 h-4 mr-1" />{t("common.logout")}
             </Button>
           </div>
         </div>
@@ -148,8 +151,8 @@ export default function DashboardPage() {
         <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl flex items-center gap-3">
           <Sparkles className="w-5 h-5 text-yellow-600" />
           <div>
-            <p className="font-semibold text-yellow-800">🎉 限时免费活动进行中</p>
-            <p className="text-sm text-yellow-700">所有 Pro 功能免费体验，7月8日后恢复原价</p>
+            <p className="font-semibold text-yellow-800">🎉 {t("promo.title")}</p>
+            <p className="text-sm text-yellow-700">{t("promo.message")}</p>
           </div>
         </div>
 
@@ -165,7 +168,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{stats.total_requests || 0}</p>
-                  <p className="text-xs text-muted-foreground">总请求数</p>
+                  <p className="text-xs text-muted-foreground">{t("dashboard.total_requests")}</p>
                 </div>
               </div>
             </Card>
@@ -176,7 +179,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{stats.total_tokens_saved || 0}</p>
-                  <p className="text-xs text-muted-foreground">节省Token</p>
+                  <p className="text-xs text-muted-foreground">{t("dashboard.tokens_saved")}</p>
                 </div>
               </div>
             </Card>
@@ -187,7 +190,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">${(stats.total_cost_saved || 0).toFixed(4)}</p>
-                  <p className="text-xs text-muted-foreground">节省费用</p>
+                  <p className="text-xs text-muted-foreground">{t("dashboard.cost_saved")}</p>
                 </div>
               </div>
             </Card>
@@ -198,7 +201,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{(stats.avg_compression_ratio || 0).toFixed(1)}%</p>
-                  <p className="text-xs text-muted-foreground">平均压缩率</p>
+                  <p className="text-xs text-muted-foreground">{t("dashboard.compression_ratio")}</p>
                 </div>
               </div>
             </Card>
@@ -209,10 +212,10 @@ export default function DashboardPage() {
         {stats?.quota && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <Card className="p-4">
-              <h3 className="font-semibold mb-3">日用量配额</h3>
+              <h3 className="font-semibold mb-3">{t("dashboard.daily_quota")}</h3>
               <div className="flex justify-between text-sm mb-1">
                 <span>{stats.quota.daily.current} / {stats.quota.daily.limit === -1 ? '∞' : stats.quota.daily.limit}</span>
-                <span>{stats.quota.daily.remaining > 0 ? `${stats.quota.daily.remaining} 剩余` : '已用完'}</span>
+                <span>{stats.quota.daily.remaining > 0 ? `${stats.quota.daily.remaining} ${t("dashboard.remaining")}` : t("dashboard.exhausted")}</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div 
@@ -222,10 +225,10 @@ export default function DashboardPage() {
               </div>
             </Card>
             <Card className="p-4">
-              <h3 className="font-semibold mb-3">月用量配额</h3>
+              <h3 className="font-semibold mb-3">{t("dashboard.monthly_quota")}</h3>
               <div className="flex justify-between text-sm mb-1">
                 <span>{stats.quota.monthly.current} / {stats.quota.monthly.limit === -1 ? '∞' : stats.quota.monthly.limit}</span>
-                <span>{stats.quota.monthly.remaining > 0 ? `${stats.quota.monthly.remaining} 剩余` : '已用完'}</span>
+                <span>{stats.quota.monthly.remaining > 0 ? `${stats.quota.monthly.remaining} ${t("dashboard.remaining")}` : t("dashboard.exhausted")}</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div 
@@ -239,29 +242,29 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="p-6">
-            <h3 className="font-semibold mb-2">用户信息</h3>
-            <p className="text-sm text-muted-foreground">邮箱: {user?.email}</p>
-            <p className="text-sm text-muted-foreground">套餐: {planNames[user?.plan] || user?.plan || "免费版"}</p>
+            <h3 className="font-semibold mb-2">{t("dashboard.user_info")}</h3>
+            <p className="text-sm text-muted-foreground">{t("dashboard.email")}: {user?.email}</p>
+            <p className="text-sm text-muted-foreground">{t("dashboard.plan")}: {planNames[user?.plan] || user?.plan || t("pricing.free")}</p>
           </Card>
           
           <Card className="p-6">
-            <h3 className="font-semibold mb-2">API Key 管理</h3>
+            <h3 className="font-semibold mb-2">{t("dashboard.api_key_mgmt")}</h3>
             <div className="flex gap-2 mb-3">
               <Input 
-                placeholder="API Key 名称" 
+                placeholder={t("dashboard.api_key_name")} 
                 value={newKeyName}
                 onChange={(e) => setNewKeyName(e.target.value)}
                 className="text-sm"
               />
               <Button size="sm" onClick={createApiKey} disabled={creatingKey}>
-                {creatingKey ? <Loader2 className="w-4 h-4 animate-spin" /> : "创建"}
+                {creatingKey ? <Loader2 className="w-4 h-4 animate-spin" /> : t("dashboard.create")}
               </Button>
             </div>
             {showNewKey && (
               <div className="mb-3 p-3 bg-green-50 rounded-lg">
-                <p className="text-sm text-green-700 mb-1">新 API Key 已创建（请保存）：</p>
+                <p className="text-sm text-green-700 mb-1">{t("dashboard.new_key_created")}</p>
                 <code className="text-xs break-all">{showNewKey}</code>
-                <Button variant="ghost" size="sm" className="mt-2" onClick={() => setShowNewKey(null)}>知道了</Button>
+                <Button variant="ghost" size="sm" className="mt-2" onClick={() => setShowNewKey(null)}>{t("dashboard.got_it")}</Button>
               </div>
             )}
             <div className="space-y-2">
@@ -271,23 +274,23 @@ export default function DashboardPage() {
                     <p className="text-sm font-medium">{key.name}</p>
                     <p className="text-xs text-muted-foreground">{key.key_prefix}...</p>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => deleteApiKey(key.id)}>删除</Button>
+                  <Button variant="ghost" size="sm" onClick={() => deleteApiKey(key.id)}>{t("dashboard.delete")}</Button>
                 </div>
               ))}
               {apiKeys.length === 0 && (
-                <p className="text-sm text-muted-foreground">暂无 API Key</p>
+                <p className="text-sm text-muted-foreground">{t("dashboard.no_api_keys")}</p>
               )}
             </div>
           </Card>
           
           <Card className="p-6">
-            <h3 className="font-semibold mb-2">快速开始</h3>
+            <h3 className="font-semibold mb-2">{t("dashboard.quick_start")}</h3>
             <div className="space-y-2">
               <Link href="/docs">
-                <Button variant="outline" size="sm" className="w-full">查看文档</Button>
+                <Button variant="outline" size="sm" className="w-full">{t("docs.title")}</Button>
               </Link>
               <Link href="/pricing">
-                <Button variant="outline" size="sm" className="w-full">升级套餐</Button>
+                <Button variant="outline" size="sm" className="w-full">{t("dashboard.upgrade_plan")}</Button>
               </Link>
             </div>
           </Card>
