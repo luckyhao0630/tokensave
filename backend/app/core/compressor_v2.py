@@ -151,36 +151,34 @@ class SmartCrusher:
     """JSON/结构化数据压缩器 - V2增强"""
     
     @staticmethod
-    def compress(data: Any, max_depth: int = 3, current_depth: int = 0) -> Any:
-        """递归压缩JSON数据"""
+    def compress(data: Any, max_depth: int = 4, current_depth: int = 0) -> Any:
+        """递归压缩JSON数据 - 降低阈值"""
         if current_depth >= max_depth:
-            if isinstance(data, str) and len(data) > 200:
-                return data[:100] + "... [truncated]"
+            if isinstance(data, str) and len(data) > 100:
+                return data[:80] + f"... [{len(data)} chars]"
             return data
         
         if isinstance(data, dict):
             compressed = {}
             for key, value in data.items():
-                # 跳过空值和默认值
-                if value is None or value == "" or value == [] or value == {}:
-                    continue
-                if value is False or value == 0:
+                # 只跳过真正的空值，保留 0 和 False（它们可能是有效数据）
+                if value is None or value == "":
                     continue
                 compressed[key] = SmartCrusher.compress(value, max_depth, current_depth + 1)
             return compressed
         
         elif isinstance(data, list):
-            if len(data) > 20:
-                # 保留前5个和后2个，中间用摘要
-                kept = data[:5] + data[-2:]
-                summary = f"... [{len(data) - 7} items similar]"
+            if len(data) > 5:
+                # 保留前3个和后1个，中间用摘要
+                kept = data[:3] + data[-1:]
+                summary = f"... [{len(data) - 4} more items]"
                 compressed = [SmartCrusher.compress(v, max_depth, current_depth + 1) for v in kept]
                 return compressed + [summary]
             return [SmartCrusher.compress(v, max_depth, current_depth + 1) for v in data]
         
         elif isinstance(data, str):
-            if len(data) > 1000:
-                return data[:200] + f"... [{len(data)} chars total]"
+            if len(data) > 300:
+                return data[:150] + f"... [{len(data)} chars total]"
             return data
         
         return data
@@ -202,21 +200,25 @@ class LogCompressor:
     @staticmethod
     def compress(text: str) -> str:
         lines = text.split('\n')
-        if len(lines) <= 10:
+        if len(lines) <= 3:
             return text
         
         # 提取关键行（错误、警告、开头、结尾）
         key_lines = []
         error_lines = [l for l in lines if any(m in l for m in ["ERROR", "FATAL", "CRITICAL", "Exception"])]
         warn_lines = [l for l in lines if "WARN" in l]
+        info_lines = [l for l in lines if "INFO" in l]
         
-        key_lines.extend(lines[:3])  # 开头
+        key_lines.extend(lines[:2])  # 开头2行
         if error_lines:
-            key_lines.append(f"... [{len(error_lines)} errors/exceptions] ...")
-            key_lines.extend(error_lines[:5])  # 前5条错误
-        if warn_lines:
+            key_lines.append(f"... [{len(error_lines)} errors] ...")
+            key_lines.extend(error_lines[:3])  # 前3条错误
+        elif warn_lines:
             key_lines.append(f"... [{len(warn_lines)} warnings] ...")
-        key_lines.extend(lines[-2:])  # 结尾
+            key_lines.extend(warn_lines[:2])
+        elif len(info_lines) > 5:
+            key_lines.append(f"... [{len(info_lines)} info lines] ...")
+        key_lines.extend(lines[-1:])  # 结尾1行
         
         return '\n'.join(key_lines)
 
@@ -264,9 +266,14 @@ class TextCompressor:
     """通用文本压缩器 - V2增强，支持智能摘要"""
     
     @staticmethod
-    def compress(text: str, max_chars: int = 2000) -> str:
+    def compress(text: str, max_chars: int = 800) -> str:
         if len(text) <= max_chars:
             return text
+        
+        # 先检测重复内容
+        has_repeat, pattern, count = TextCompressor.detect_repetition(text)
+        if has_repeat and pattern and count > 2:
+            return f"[Repeated pattern ({count}x)]: {pattern[:100]}{'...' if len(pattern) > 100 else ''}"
         
         # 智能截断：保留开头和结尾，中间摘要
         head_len = max_chars // 3
@@ -329,7 +336,7 @@ class ConversationCompressor:
     @staticmethod
     def compress(messages: List[Dict[str, str]]) -> List[Dict[str, str]]:
         """压缩多轮对话"""
-        if len(messages) <= 3:
+        if len(messages) <= 2:
             return messages
         
         # 保留系统提示
@@ -584,7 +591,7 @@ class TokenCompressor:
             # 文本/Markdown/HTML - 本地规则 + 可选LLM
             for msg in messages:
                 content = msg.get("content", "")
-                if len(content) < 500:
+                if len(content) < 100:  # 降低阈值：100字符以下不压缩
                     compressed_messages.append(msg)
                     continue
                 

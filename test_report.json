@@ -1,0 +1,134 @@
+{
+  "timestamp": "2026-06-09 14:20:13",
+  "tests": [
+    {
+      "name": "用户注册",
+      "status": "✅",
+      "details": "用户ID: 20, 邮箱: test_1780986013@example.com",
+      "data": null
+    },
+    {
+      "name": "OAuth2 登录",
+      "status": "✅",
+      "details": "耗时: 1218ms, Token: eyJhbGciOiJIUzI1NiIs...",
+      "data": null
+    },
+    {
+      "name": "用户信息",
+      "status": "✅",
+      "details": "邮箱: test_1780986013@example.com, 套餐: free",
+      "data": null
+    },
+    {
+      "name": "创建 API Key",
+      "status": "✅",
+      "details": "Key: ts_Si8xTl1RFH1ejm8zk...",
+      "data": null
+    },
+    {
+      "name": "简单压缩",
+      "status": "✅",
+      "details": "耗时: 1644ms, 压缩率: 0.0%, 节省: $0.0000",
+      "data": null
+    },
+    {
+      "name": "客服对话压缩",
+      "status": "⚠️",
+      "details": "耗时: 1606ms, 原始: 280 tokens → 压缩后: 280 tokens, 压缩率: 0.0%, 节省: $0.0000",
+      "data": null
+    },
+    {
+      "name": "内容完整性",
+      "status": "✅",
+      "details": "消息数量保持: 4 → 4",
+      "data": null
+    },
+    {
+      "name": "JSON 日志压缩",
+      "status": "⚠️",
+      "details": "耗时: 1643ms, 压缩率: 5.3% (期望 >50%), 节省: $0.0001",
+      "data": {
+        "transforms": [
+          "smart_crusher"
+        ]
+      }
+    },
+    {
+      "name": "重复内容压缩",
+      "status": "⚠️",
+      "details": "耗时: 1679ms, 压缩率: 0.0% (期望 >30%), 节省: $0.0000",
+      "data": null
+    },
+    {
+      "name": "用量统计",
+      "status": "✅",
+      "details": "总请求: 4, 总节省Token: 20, 总节省费用: $0.0001",
+      "data": null
+    },
+    {
+      "name": "Token 刷新",
+      "status": "✅",
+      "details": "新Token: eyJhbGciOiJIUzI1NiIs...",
+      "data": null
+    },
+    {
+      "name": "套餐查询",
+      "status": "✅",
+      "details": "共 4 个套餐: free, pro, team, enterprise",
+      "data": null
+    },
+    {
+      "name": "性能测试",
+      "status": "⚠️",
+      "details": "平均延迟: 1630ms, 最小: 1594ms, 最大: 1714ms, 成功率: 10/10",
+      "data": null
+    },
+    {
+      "name": "Proxy 提供商",
+      "status": "❌",
+      "details": "HTTP Error 405: Method Not Allowed",
+      "data": null
+    },
+    {
+      "name": "页面 /",
+      "status": "✅",
+      "details": "HTTP 200, 63540 bytes, 338ms",
+      "data": null
+    },
+    {
+      "name": "页面 /login",
+      "status": "✅",
+      "details": "HTTP 200, 13949 bytes, 161ms",
+      "data": null
+    },
+    {
+      "name": "页面 /register",
+      "status": "✅",
+      "details": "HTTP 200, 17466 bytes, 203ms",
+      "data": null
+    },
+    {
+      "name": "页面 /pricing",
+      "status": "✅",
+      "details": "HTTP 200, 8813 bytes, 411ms",
+      "data": null
+    },
+    {
+      "name": "页面 /docs",
+      "status": "✅",
+      "details": "HTTP 200, 53949 bytes, 170ms",
+      "data": null
+    },
+    {
+      "name": "页面 /guide",
+      "status": "✅",
+      "details": "HTTP 200, 44490 bytes, 131ms",
+      "data": null
+    }
+  ],
+  "summary": {
+    "passed": 15,
+    "failed": 1,
+    "warnings": 4
+  }
+}
