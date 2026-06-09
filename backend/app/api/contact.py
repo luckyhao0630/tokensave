@@ -6,7 +6,7 @@ from datetime import datetime
 import json
 
 from app.models.database import get_db, User, ContactMessage
-from app.api.auth import get_current_user_dependency
+from app.api.auth import get_current_user_dependency, get_current_user_optional
 
 router = APIRouter(prefix="/api/v1", tags=["contact"])
 
@@ -62,7 +62,7 @@ def send_feishu_notification(message_data: dict):
 async def submit_contact(
     request: ContactRequest,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_dependency)
+    current_user: Optional[User] = Depends(get_current_user_optional)
 ):
     """提交联系/反馈消息"""
     

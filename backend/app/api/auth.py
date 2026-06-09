@@ -68,6 +68,14 @@ async def get_api_key_user(x_api_key: str = Header(None, alias="X-API-Key"), db:
         )
     return api_key.user
 
+async def get_current_user_optional(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    """可选认证：有token返回用户，没有返回None"""
+    try:
+        user = get_current_user(db, token)
+        return user
+    except Exception:
+        return None
+
 # 用户注册
 @router.post("/auth/register", response_model=UserResponse)
 async def register(request: RegisterRequest, db: Session = Depends(get_db)):
