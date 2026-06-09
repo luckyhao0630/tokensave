@@ -33,3 +33,11 @@ To https://github.com/luckyhao0630/tokensave.git
 [2026-06-09 20:33:22] ❌ 提交失败: Command '['git', 'push', 'origin', 'main']' timed out after 59.99993162 seconds
 [2026-06-09 20:33:22] === 工作流完成 ===
 fatal: unable to access 'https://github.com/luckyhao0630/tokensave.git/': Recv failure: Operation timed out
+[2026-06-09 21:03:38] === MediaKit 自动化工作流启动 ===
+[2026-06-09 21:03:38] 🔄 检查缺失的前端页面...
+[2026-06-09 21:03:38] ✅ background_removal 页面已存在
+[2026-06-09 21:03:38] ✅ video_download 页面已存在
+[2026-06-09 21:03:38] 🔄 提交代码变更...
+[2026-06-09 21:04:39] ❌ 提交失败: Command '['git', 'push', 'origin', 'main']' timed out after 59.999913004999996 seconds
+[2026-06-09 21:04:39] === 工作流完成 ===
+fatal: unable to access 'https://github.com/luckyhao0630/tokensave.git/': Recv failure: Operation timed out
