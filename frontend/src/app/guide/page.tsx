@@ -22,14 +22,14 @@ export default function GuidePage() {
   const steps = [
     {
       step: 1,
-      title: "注册账号",
-      desc: "点击首页「开始使用」，输入邮箱和密码，30秒完成注册",
-      code: "// 无需代码，浏览器打开 https://www.tokesave.com/register",
+      title: t("home.step1_title"),
+      desc: t("home.step1_desc"),
+      code: "// " + t("guide.step1_code"),
     },
     {
       step: 2,
-      title: "获取 API Key",
-      desc: "登录后进入 Dashboard → 创建 API Key → 复制生成的 Key",
+      title: t("home.step2_title"),
+      desc: t("home.step2_desc"),
       code: `// 登录后访问 Dashboard
 // https://www.tokesave.com/dashboard
 // 
@@ -38,8 +38,8 @@ export default function GuidePage() {
     },
     {
       step: 3,
-      title: "替换 API 地址",
-      desc: "将原有 AI 服务的 API 地址替换为 TokenSaver 的代理地址",
+      title: t("home.step3_title"),
+      desc: t("home.step3_desc"),
       code: `// 原来的 OpenAI API 地址
 https://api.openai.com/v1/chat/completions
 
@@ -48,11 +48,11 @@ https://api.tokesave.com/proxy/openai/v1/chat/completions`,
     },
     {
       step: 4,
-      title: "添加 API Key 请求头",
-      desc: "在 HTTP 请求头中添加 X-API-Key",
+      title: t("home.step4_title"),
+      desc: t("home.step4_desc"),
       code: `// Python 示例
 headers = {
-    "Authorization": "Bearer your-openai-key",  // 你的 OpenAI Key
+    "Authorization": "Bearer your-openai-key",  // Your OpenAI Key
     "X-API-Key": "ts_xxxxxxxx_xxxxxxxxxxxxx",     // TokenSaver Key
     "Content-Type": "application/json",
 }`,
@@ -69,17 +69,17 @@ headers = {
   const fullExample = `import requests
 import os
 
-# 1. 配置
+# 1. Config
 API_KEY = os.getenv("TOKESAVER_API_KEY", "ts_xxxxxxxx_xxxxxxxxxxxxx")
 OPENAI_KEY = os.getenv("OPENAI_API_KEY", "sk-xxxxxxxx")
 
-# 2. 准备请求数据
+# 2. Prepare Request Data
 messages = [
     {"role": "system", "content": "You are a helpful assistant."},
     {"role": "user", "content": "帮我总结一下这份报告..." + " " * 1000}
 ]
 
-# 3. 发送请求（通过 TokenSaver 代理）
+# 3. Send Request (via TokenSaver Proxy)
 response = requests.post(
     "https://api.tokesave.com/proxy/openai/v1/chat/completions",
     headers={
@@ -96,15 +96,15 @@ response = requests.post(
 
 result = response.json()
 
-# 4. 查看节省了多少
-# 响应头会包含:
+# 4. Check Savings
+# Response headers include:
 # X-Tokens-Before: 1500
 # X-Tokens-After: 800
 # X-Tokens-Saved: 700
 # X-Compression-Ratio: 46.7%
 # X-Cost-Saved-USD: 0.0175
 
-print(f"AI回复: {result['choices'][0]['message']['content']}")`;
+print(f"AI Response: {result['choices'][0]['message']['content']}")`;
 
   const nodeExample = `const axios = require('axios');
 

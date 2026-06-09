@@ -27,10 +27,10 @@ export default function DocsPage() {
 
   const pythonCode = `import requests
 
-# 1. 获取 API Key（在 Dashboard 创建）
+# 1. Get API Key (Create in Dashboard)
 API_KEY = "your-api-key-here"
 
-# 2. 压缩请求
+# 2. Compression Request
 response = requests.post(
     "https://api.tokesave.com/api/v1/compress",
     headers={"X-API-Key": API_KEY},
@@ -45,7 +45,7 @@ response = requests.post(
 
 result = response.json()
 print(f"{t('docs.ratio')}: {result['savings_percentage']:.1f}%")
-print(f"节省费用: \${result['cost_saved_usd']:.4f}")`;
+print(f"Cost Saved: \${result['cost_saved_usd']:.4f}")`;
 
   const jsCode = `const API_KEY = 'your-api-key';
 
@@ -74,7 +74,7 @@ console.log('节省费用: $' + result.cost_saved_usd.toFixed(4));`;
   -d '{"messages": [{"role": "user", "content": "test"}]}'`;
 
   const proxyCode = `# {t('docs.proxy')} - 零代码改动
-# 将 API Base URL 替换为 TokenSaver Proxy
+# Replace API Base URL with TokenSaver Proxy
 
 # OpenAI
 https://api.openai.com/v1
@@ -86,7 +86,7 @@ https://api.anthropic.com/v1
 ↓
 https://api.tokesave.com/proxy/anthropic/v1
 
-# 所有请求自动压缩，返回结果不变`;
+# All requests auto-compressed, response unchanged`;
 
   const codeExamples = {
     python: pythonCode,
@@ -97,15 +97,15 @@ https://api.tokesave.com/proxy/anthropic/v1
 
   const sidebarItems = [
     {
-      title: "快速开始",
+      title: t("docs.quickstart"),
       items: [
-        { label: "概述", id: "overview" },
+        { label: t("docs.overview"), id: "overview" },
         { label: "{t('docs.install')}", id: "install" },
         { label: "{t('docs.auth')}", id: "auth" },
       ]
     },
     {
-      title: "API 参考",
+      title: t("docs.api_ref"),
       items: [
         { label: "{t('docs.compress_api')}", id: "compress-api" },
         { label: "{t('docs.proxy')}", id: "proxy" },
@@ -121,12 +121,12 @@ https://api.tokesave.com/proxy/anthropic/v1
       ]
     },
     {
-      title: "其他",
+      title: t("docs.others"),
       items: [
         { label: "{t('docs.response')}", id: "response" },
         { label: "{t('docs.models')}", id: "models" },
-        { label: "定价", id: "pricing" },
-        { label: "快速指南", id: "quickstart" },
+        { label: t("docs.pricing"), id: "pricing" },
+        { label: t("docs.quickstart"), id: "quickstart" },
       ]
     }
   ];
@@ -258,7 +258,7 @@ https://api.tokesave.com/proxy/anthropic/v1
                   {`{
   "model": "gpt-4o",
   "messages": [...],
-  "token_budget": 50000  // 可选
+  "token_budget": 50000  // optional
 }`}
                 </div>
               </Card>
@@ -355,7 +355,7 @@ https://api.tokesave.com/proxy/anthropic/v1
             </section>
 
             <section id="curl-sdk" className="mt-12">
-              <h2 className="text-2xl font-bold tracking-tight mb-6">cURL 示例</h2>
+              <h2 className="text-2xl font-bold tracking-tight mb-6">cURL Example</h2>
               <div className="relative">
                 <pre className="bg-secondary rounded-xl p-4 text-xs font-mono overflow-x-auto">
                   <code>{curlCode}</code>
@@ -381,15 +381,15 @@ https://api.tokesave.com/proxy/anthropic/v1
               
               <div className="text-xs font-mono bg-secondary rounded-xl p-6">
                 <pre>{`{
-  "compressed_messages": [...],  // 压缩后的消息数组
-  "tokens_before": 10000,         // 原始 Token 数
-  "tokens_after": 2000,           // 压缩后 Token 数
+  "compressed_messages": [...],  // compressed messages array
+  "tokens_before": 10000,         // original token count
+  "tokens_after": 2000,           // compressed token count
   "savings_percentage": 80.0,     // {t('docs.ratio')}
-  "transforms_applied": [         // 应用的压缩策略
+  "transforms_applied": [         // applied compression strategies
     "smart_crusher",
     "cache_aligner"
   ],
-  "cost_saved_usd": 0.024         // 节省的费用（USD）
+  "cost_saved_usd": 0.024         // saved cost (USD)
 }`}</pre>
               </div>
             </section>
@@ -450,10 +450,10 @@ https://api.tokesave.com/proxy/anthropic/v1
               <h2 className="text-2xl font-bold tracking-tight mb-6">{t('docs.quickstart')}</h2>
               <div className="space-y-6">
                 {[
-                  { step: "1", title: "注册账号", desc: "访问 https://tokesave.com 注册免费账号，1分钟即可完成。" },
-                  { step: "2", title: "创建 API Key", desc: "在 Dashboard 点击创建新密钥，复制生成的 API Key。" },
-                  { step: "3", title: "发送请求", desc: "在请求头添加 X-API-Key，发送消息到 /api/v1/compress，立即获得压缩结果。" },
-                  { step: "4", title: "查看省钱统计", desc: "在 Dashboard 查看节省的 Token 数量和费用，优化你的使用策略。" },
+                  { step: "1", title: t('docs.step1_title'), desc: t('docs.step1_desc') },
+                  { step: "2", title: t('docs.step2_title'), desc: t('docs.step2_desc') },
+                  { step: "3", title: t('docs.step3_title'), desc: t('docs.step3_desc') },
+                  { step: "4", title: t('docs.step4_title'), desc: t('docs.step4_desc') },
                 ].map((item) => (
                   <div key={item.step} className="flex items-start gap-4">
                     <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">
