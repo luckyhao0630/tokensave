@@ -457,7 +457,7 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">{msg.subject}</span>
                       <Badge variant={msg.status === 'replied' ? 'default' : 'secondary'} className="text-xs">
-                        {msg.status === 'replied' ? '{t('profile.replied')}' : msg.status === 'new' ? '待处理' : '已关闭'}
+                        {msg.status === 'replied' ? t('profile.replied') : msg.status === 'new' ? t('profile.new_msg') : t('profile.closed')}
                       </Badge>
                     </div>
                     <span className="text-xs text-muted-foreground">

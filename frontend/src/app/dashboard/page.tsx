@@ -10,7 +10,6 @@ import { useTranslation } from "react-i18next";
 import { Zap, Loader2, LogOut, TrendingDown, BarChart3, DollarSign, Key, FileText, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "react-i18next";
 
 export default function DashboardPage() {
   const router = useRouter();
