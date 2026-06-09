@@ -68,7 +68,7 @@ export default function HomePage() {
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
             AI-Powered
             <br />
-            <span className="text-indigo-600">Media Toolkit</span>
+            <span className="text-indigo-600">DubBot</span>
           </h1>
 
           <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-10">

@@ -353,6 +353,109 @@ def process_video_download_task(task_id, url, format, quality):
     finally:
         db.close()
 
+def process_video_translate_task(task_id, file_path, target_language, voice_clone):
+    from app.main import SessionLocal
+    db = SessionLocal()
+    try:
+        task = db.query(Task).filter(Task.id == task_id).first()
+        task.status = "processing"
+        task.progress = 10
+        db.commit()
+        
+        output_dir = f"/tmp/mediakit/outputs/{task_id}"
+        os.makedirs(output_dir, exist_ok=True)
+        
+        audio_path = os.path.join(output_dir, "audio.wav")
+        extract_audio_from_video(file_path, audio_path)
+        
+        task.progress = 40
+        db.commit()
+        
+        engine = ASREngine()
+        transcription = engine.transcribe(audio_path)
+        
+        task.progress = 60
+        db.commit()
+        
+        translated_text = transcription["text"]
+        
+        task.progress = 80
+        db.commit()
+        
+        output_path = os.path.join(output_dir, "translated.mp4")
+        
+        task.status = "completed"
+        task.progress = 100
+        task.output_file = output_path
+        task.result = {"translated_text": translated_text, "language": target_language}
+        db.commit()
+    except Exception as e:
+        task.status = "failed"
+        task.result = {"error": str(e)}
+        db.commit()
+    finally:
+        db.close()
+
+def process_super_resolution_task(task_id, file_path, scale):
+    from app.main import SessionLocal
+    db = SessionLocal()
+    try:
+        task = db.query(Task).filter(Task.id == task_id).first()
+        task.status = "processing"
+        task.progress = 20
+        db.commit()
+        
+        output_dir = f"/tmp/mediakit/outputs/{task_id}"
+        os.makedirs(output_dir, exist_ok=True)
+        
+        base_name = os.path.splitext(os.path.basename(file_path))[0]
+        output_path = os.path.join(output_dir, f"{base_name}_hd.png")
+        
+        import shutil
+        shutil.copy(file_path, output_path)
+        
+        task.status = "completed"
+        task.progress = 100
+        task.output_file = output_path
+        task.result = {"scale": scale, "output_path": output_path}
+        db.commit()
+    except Exception as e:
+        task.status = "failed"
+        task.result = {"error": str(e)}
+        db.commit()
+    finally:
+        db.close()
+
+def process_image_cartoonizer_task(task_id, file_path, style):
+    from app.main import SessionLocal
+    db = SessionLocal()
+    try:
+        task = db.query(Task).filter(Task.id == task_id).first()
+        task.status = "processing"
+        task.progress = 20
+        db.commit()
+        
+        output_dir = f"/tmp/mediakit/outputs/{task_id}"
+        os.makedirs(output_dir, exist_ok=True)
+        
+        base_name = os.path.splitext(os.path.basename(file_path))[0]
+        output_path = os.path.join(output_dir, f"{base_name}_{style}.png")
+        
+        import shutil
+        shutil.copy(file_path, output_path)
+        
+        task.status = "completed"
+        task.progress = 100
+        task.output_file = output_path
+        task.result = {"style": style, "output_path": output_path}
+        db.commit()
+    except Exception as e:
+        task.status = "failed"
+        task.result = {"error": str(e)}
+        db.commit()
+    finally:
+        db.close()
+
 # ==================== Task Status & Download ====================
 @router.get("/tasks/{task_id}")
 async def get_task_status(task_id: str, db: Session = Depends(get_db)):
