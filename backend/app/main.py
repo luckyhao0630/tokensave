@@ -31,15 +31,15 @@ app.include_router(tools.router)
 
 @app.get("/api/v1")
 async def root_api():
-    return {"message": "MediaKit API", "version": "2.0.0", "docs": "/docs"}
+    return {"message": "DobBot API", "version": "2.0.0", "docs": "/docs"}
 
 @app.get("/api/v1/")
 async def root_api_slash():
-    return {"message": "MediaKit API", "version": "2.0.0", "docs": "/docs"}
+    return {"message": "DobBot API", "version": "2.0.0", "docs": "/docs"}
 
 @app.get("/")
 async def root():
-    return {"message": "MediaKit API", "version": "2.0.0", "docs": "/docs"}
+    return {"message": "DobBot API", "version": "2.0.0", "docs": "/docs"}
 
 @app.get("/health")
 async def health_check():
