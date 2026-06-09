@@ -9,16 +9,16 @@ import Navbar from "@/components/navbar";
 
 export default function BackgroundRemovalPage() {
   const router = useRouter();
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [taskId, setTaskId] = useState(null);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
+  const [taskId, setTaskId] = useState<string | null>(null);
+  const [result, setResult] = useState<any | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [backgroundColor, setBackgroundColor] = useState("transparent");
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
     const allowed = [".jpg", ".jpeg", ".png", ".webp"];
@@ -53,13 +53,13 @@ export default function BackgroundRemovalPage() {
       setUploading(false);
       setProcessing(true);
       pollProgress(data.id);
-    } catch (err) {
-      setError(err.message || "Upload failed");
+    } catch (err: any) {
+      setError(err?.message || "Upload failed");
       setUploading(false);
     }
   };
 
-  const pollProgress = async (id) => {
+  const pollProgress = async (id: string) => {
     const interval = setInterval(async () => {
       try {
         const resp = await fetch(`https://api.tokesave.com/api/v1/tasks/${id}`);
