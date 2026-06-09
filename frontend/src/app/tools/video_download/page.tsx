@@ -12,9 +12,9 @@ export default function VideoDownloadPage() {
   const [url, setUrl] = useState("");
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [taskId, setTaskId] = useState(null);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
+  const [taskId, setTaskId] = useState<string | null>(null);
+  const [result, setResult] = useState<any | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [format, setFormat] = useState("mp4");
   const [quality, setQuality] = useState("best");
 
@@ -32,13 +32,13 @@ export default function VideoDownloadPage() {
       const data = await resp.json();
       setTaskId(data.id);
       pollProgress(data.id);
-    } catch (err) {
-      setError(err.message || "Download failed");
+    } catch (err: any) {
+      setError(err?.message || "Download failed");
       setProcessing(false);
     }
   };
 
-  const pollProgress = async (id) => {
+  const pollProgress = async (id: string) => {
     const interval = setInterval(async () => {
       try {
         const resp = await fetch(`https://api.tokesave.com/api/v1/tasks/${id}`);
